@@ -1,14 +1,13 @@
 
-### meiduo ###
+### backend ###
 ### .DS_Store 是Mac OS保存文件夹的自定义属性的隐藏文件，如文件的图标位置或背景色 ###
 .idea
 .gitignore
 .DS_Store
-
-release.sh
+.pycahce
 
 ### frontend ###
-FrontEnd/node_modules
+frontend/node_modules
 
 
 

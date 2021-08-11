@@ -1,0 +1,88 @@
+import axios from 'axios'
+
+// 获取短信验证码
+export const send_sms_code = mobile => { return axios.get(`/oauth/sendSmsCode/${mobile}/`) }
+
+// 获取钉钉登陆链接
+export const login_by_ding = (code = null) => { return axios.get('/oauth/dingTalk/', { params: { loginTmpCode: code } }) }
+
+// 钉钉回调
+export const ding_login = code => { return axios.post('/oauth/dingTalk/', { code: code }) }
+
+// 账号注册
+export const logon = data => { return axios.post('/logon/', data) }
+
+// 获取指定用户数
+export const check_user = param => { return axios.get('/userCount/', { params: { param: param } }) }
+
+// 获取用户列表
+export const user_list = (param = null) => { return axios.get('/userList/', { params: { param: param } }) }
+
+// 获取系统图片资源链接
+export const get_image = location => { return axios.get('/getImage/', { params: { location: location } }) }
+
+// 登陆
+export const login = data => { return axios.post('/login/', data) }
+
+// 获取测试应用列表
+export const clients = () => { return axios.get('/clients/') }
+
+// 创建应用
+export const create_client = data => { return axios.post('/clients/', data) }
+
+// 获取测试模块列表
+export const modules = () => { return axios.get('/modules/') }
+
+// 创建模块
+export const create_module = data => { return axios.post('/modules/', data) }
+
+// 获取测试用例列表
+export const case_list = (page, page_size, conditions) => { return axios.get('/caseList/', { params: { page: page, page_size: page_size, conditions: conditions } }) }
+
+// xmind导入用例
+export const uploadXmindCase = async data => { return axios.post('/uploadXmindCase/', data) }
+
+// 校验用例是否存在
+export const check_case = case_id => { return axios.get('/case/', { params: { case_id: case_id } }) }
+
+// 修改用例
+export const modify_case = data => { return axios.put('/case/', data) }
+
+// 删除用例
+export const delete_case = (id, case_id) => { return axios.delete('/case/', { data: { id: id, case_id: case_id } }) }
+
+// 手动新增用例
+export const create_case = data => { return axios.post('/case/', data) }
+
+// 获取服务器常量配置
+export const get_constants = param => { return axios.get(`/getConstants/${param}/`) }
+
+// 获取测试任务界面用例列表
+export const job_case_list = () => { return axios.get(`/jobCaseList/`) }
+
+// 创建测试任务
+export const create_job = data => { return axios.post('/testJob/', data) }
+
+// 修改测试任务
+export const modify_job = data => { return axios.put('/testJob/', data) }
+
+// 获取测试任务列表
+export const job_list = (page, page_size, conditions) => { return axios.get('/jobList/', { params: { page: page, page_size: page_size, conditions: conditions } }) }
+
+// 指派测试任务
+export const dispatch_job = data => { return axios.put('/dispatchJob/', data) }
+
+// 获取测试任务列表详情
+export const job_list_detail = param => { return axios.get(`/jobListDetail/${param}/`) }
+
+// 获取测试任务中的用例详情
+export const job_case_detail = id => { return axios.get(`/jobCaseDetail/${id}/`) }
+
+// 上传图片
+export const uploadImage = data => { return axios.post('/uploadImage/', data) }
+
+// 删除图片
+export const deleteRemoteImage = url => { return axios.delete('/uploadImage/', { data: { url: url } }) }
+
+// 保存测试结果
+export const saveTestResult = data => { return axios.post('/testResult/', data) }

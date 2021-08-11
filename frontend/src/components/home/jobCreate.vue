@@ -1,0 +1,329 @@
+<template>
+  <div class="main">
+    <!-- 创建任务表单 -->
+    <el-col :span="11">
+      <div class="title">
+        <p>创建测试任务</p>
+        <el-divider></el-divider>
+      </div>
+      <div class="form">
+        <span class="tips">&nbsp;创建任务提交之前请先勾选任务所需之用例</span>
+        <el-form :model="jobForm" label-width="10em" ref="jobForm" :rules="rules" size="mini">
+          <el-form-item label="任务名称:" prop="task_name">
+            <el-input v-model="jobForm.task_name" class="task_name"></el-input>
+          </el-form-item>
+          <el-form-item label="任务详情:">
+            <el-input
+              type="textarea"
+              :autosize="{ minRows: 3, maxRows: 5 }"
+              v-model="jobForm.task_detail"
+              style="width: 25em;"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="优先级:" prop="level">
+            <el-select v-model="jobForm.level">
+              <el-option v-for="item in levels" :key="item[0]" :label="item[1]" :value="item[0]"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="任务类型:" prop="type">
+            <el-select v-model="jobForm.type">
+              <el-option v-for="item in types" :key="item[0]" :label="item[1]" :value="item[0]"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="责任人:">
+            <el-select v-model="jobForm.executor" filterable clearable>
+              <el-option
+                v-for="item in executors"
+                :key="item.id"
+                :label="item.nickname"
+                :value="item.id"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="关联需求:">
+            <el-input v-model="jobForm.prd_no"></el-input>
+          </el-form-item>
+          <el-form-item label="计划完成时间:" prop="expect_end_time">
+            <el-date-picker
+              v-model="jobForm.expect_end_time"
+              type="datetime"
+              placeholder="选择日期时间"
+              value-format="yyyy-MM-dd HH:mm:ss"
+              width="50%"
+            ></el-date-picker>
+          </el-form-item>
+        </el-form>
+        <div class="footer">
+          <el-button size="mini" @click="jobForm = {}">重 置</el-button>
+          <el-button size="mini" type="primary" @click="create_submit()">保 存</el-button>
+        </div>
+      </div>
+    </el-col>
+    <el-col :span="2">
+      <pre style="margin:0; padding: 0;">&nbsp;</pre>
+    </el-col>
+    <!-- 用例列表 -->
+    <el-col :span="7" class="caselist">
+      <el-input placeholder="关键字过滤" v-model="filterText" size="mini"></el-input>
+      <el-tree
+        :data="treeData"
+        show-checkbox
+        node-key="id"
+        :render-after-expand="false"
+        @check-change="handleChange"
+        :props="defaultProps"
+        :filter-node-method="filterNode"
+        ref="tree"
+      ></el-tree>
+      <div>
+        <p>
+          <span>
+            ☑️ 您已勾选&nbsp;
+            <span style="color: red;">{{ num }}</span>&nbsp;条用例
+          </span>
+          <el-button
+            style="margin-left: 5em;"
+            size="mini"
+            type="primary"
+            plain
+            @click="clearCaseList()"
+          >清除选中</el-button>
+        </p>
+      </div>
+    </el-col>
+  </div>
+</template>
+<script>
+import { job_case_list, get_constants, user_list, create_job } from "@/api";
+export default {
+  data() {
+    return {
+      // 列表树过滤
+      filterText: "",
+
+      // 列表树
+      treeData: [],
+      defaultProps: {
+        children: "subs",
+        label: "name"
+      },
+
+      // 创建任务表单、用例数组
+      jobForm: {},
+      case: [],
+
+      // 表单校验规则
+      rules: {
+        task_name: [
+          {
+            required: true,
+            message: "该项为必填",
+            trigger: "blur"
+          }
+        ],
+        level: [
+          {
+            required: true,
+            message: "该项为必填",
+            trigger: "blur"
+          }
+        ],
+        type: [
+          {
+            required: true,
+            message: "该项为必填",
+            trigger: "blur"
+          }
+        ],
+        expect_end_time: [
+          {
+            required: true,
+            message: "该项为必填",
+            trigger: "blur"
+          }
+        ]
+      },
+
+      // 下拉框数据
+      levels: [],
+      types: [],
+      executors: []
+    };
+  },
+  methods: {
+    // 过滤节点。绑定的属性方法
+    // value是调用组件filter方法是传入的值，data是节点数据对象。下面的name即是defaultProps中定义的值
+    filterNode(value, data) {
+      if (!value) return true;
+      return data.name.indexOf(value) !== -1;
+    },
+
+    // 获取用例列表树数据
+    getCaseList() {
+      job_case_list().then(res => {
+        this.treeData = res.data;
+      });
+    },
+
+    // 节点选中状态变化的绑定事件。这里用不上第三个参数，所以没有入参
+    handleChange(data, self) {
+      if (data.type == "case") {
+        if (self) {
+          this.case.push(data.id);
+        } else {
+          for (let i = 0; i < this.case.length; i++) {
+            if (this.case[i] == data.id) {
+              this.case.splice(i, 1);
+            }
+          }
+        }
+      }
+    },
+
+    // 清空已勾选的用例
+    clearCaseList() {
+      this.$refs.tree.setCheckedNodes(this.case);
+    },
+
+    // 加载下拉选项
+    loadOption() {
+      get_constants("JOB").then(res => {
+        this.levels = res.data.LEVEL;
+        this.types = res.data.TYPE;
+      });
+      user_list().then(res => {
+        this.executors = res.data;
+      });
+    },
+
+    // 创建提交
+    create_submit() {
+      this.$refs.jobForm.validate(valid => {
+        if (valid) {
+          if (this.case.length == 0) {
+            this.$message({
+              type: "error",
+              message: "请勾选测试用例"
+            });
+          } else {
+            this.jobForm.case = this.case;
+            create_job(this.jobForm).then(res => {
+              this.$message({
+                type: "success",
+                message: res.data.msg
+              });
+            });
+          }
+        }
+      });
+    }
+  },
+  watch: {
+    // 过滤节点
+    filterText(val) {
+      // 防抖
+      let timer = null;
+      let func = this.$refs.tree.filter;
+      (() => {
+        if (timer !== null) {
+          clearTimeout(timer);
+        }
+        timer = setTimeout(() => {
+          // filter 接收一个任意类型的参数，该参数会在 filter-node-method 中作为第一个参数
+          func(val);
+        }, 500);
+      })();
+    }
+  },
+  computed: {
+    // 选择用例数
+    num() {
+      if (this.case) {
+        return this.case.length;
+      }
+      return 0;
+    }
+  },
+  mounted() {
+    this.getCaseList();
+    this.loadOption();
+  }
+};
+</script>
+<style scoped>
+.main {
+  margin: 1em;
+}
+.caselist p {
+  text-align: left;
+  padding-left: 1em;
+  color: grey;
+}
+/* 列表部分样式 */
+.caselist {
+  background-color: rgb(214, 212, 212);
+  height: 39em;
+  margin-top: 3.5em;
+}
+.el-tree {
+  margin: 0.2em 0 0 0;
+  height: 33em;
+  color: black;
+  border: 1px solid skyblue;
+  overflow: auto;
+}
+.el-tree /deep/ .el-tree-node__content:hover {
+  background-color: #91beca;
+}
+.el-tree /deep/ .el-tree-node:focus > .el-tree-node__content {
+  background-color: #91beca;
+}
+.caselist /deep/ input.el-input__inner {
+  border-radius: 0;
+  border: 2px solid black;
+}
+
+/* 表单部分样式 */
+.title {
+  width: 100%;
+  text-align: left;
+}
+.title p {
+  font-size: 1.5em;
+  margin: 0.2em 0;
+}
+.title .el-divider {
+  margin: 1em 0 2em 0;
+  background-color: tomato;
+  padding: 2px 0;
+}
+.form {
+  background-color: whitesmoke;
+  padding: 1em 0 2em 0;
+}
+.form .tips {
+  font-size: 0.8em;
+  color: tomato;
+  margin-left: 2em;
+}
+.form .footer {
+  text-align: right;
+  margin-top: 2em;
+  margin-right: 2em;
+}
+.form .footer .el-button {
+  margin-left: 3em;
+}
+.el-form-item {
+  margin: 2em 0;
+}
+.form .task_name {
+  width: 25em !important;
+}
+.form .el-input {
+  width: 15em;
+}
+.form .el-select {
+  width: 10em;
+}
+</style>

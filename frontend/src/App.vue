@@ -1,32 +1,44 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
+  <div id="app" @click="clickHandler">
+    <router-view v-wechat-title="$route.meta.title" />
   </div>
 </template>
+<script>
+/* eslint-disable */
 
+export default {
+  // 全局解决element UI button 点击后不失焦的问题
+  // 但是部分组件里面的按钮由于没有冒泡，所以仍无法解决
+  methods: {
+    clickHandler(ev) {
+      if ((ev.target.nodeName == "SPAN") | (ev.target.nodeName == "I")) {
+        ev.target.parentNode.blur();
+      }
+      if (ev.target.nodeName == "BUTTON") {
+        ev.target.blur();
+      }
+    }
+  }
+};
+</script>
 <style>
+body,
+html,
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+  margin: 0px;
+  padding: 0px;
+  height: 100%;
+  width: 100%;
 }
 
-#nav {
-  padding: 30px;
+/* 统一修改消息弹框样式 */
+.el-message {
+  top: 30px !important;
+  min-width: 5em !important;
+  padding: 0.5em !important;
+  border-radius: 0 !important;
 }
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
+.el-message .el-message__content {
+  font-size: 1em;
 }
 </style>

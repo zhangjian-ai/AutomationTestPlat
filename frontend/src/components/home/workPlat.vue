@@ -12,8 +12,8 @@
             style="margin-left: 8em; padding: 0.5em;"
             @click="getJobList()"
           >{{ type == 0 ? '已完成' : '未完成' }}</el-button>
-          <el-divider></el-divider>
         </div>
+        <el-divider></el-divider>
         <el-table
           :data="jobList"
           :show-header="false"
@@ -40,10 +40,10 @@
         <!-- 分页 -->
         <div style="text-align: right;">
           <pagination
-            :count="count"
-            :page.sync="page"
-            :page_size.sync="page_size"
-            @function="getJobList"
+            :count="job_count"
+            :page.sync="job_page"
+            :page_size.sync="job_page_size"
+            @function="getJobList()"
           ></pagination>
         </div>
       </div>
@@ -53,62 +53,23 @@
     </el-col>
     <!-- 工作区 -->
     <el-col :span="showJobs ? 16 : 24" v-show="currentJob.task_no">
-      <!-- 任务详情区 -->
+      <!-- 任务详情 -->
       <div class="job_detail">
-        <el-row>
-          <span style="color: tomato; font-size: 1.4em;">{{ currentJob.type_str }}</span>
-          <span style="margin-left: 3em; font-size: 0.8em;">
-            责任人:
-            <span style="color: #3a6b9c; font-size: 1.2em;">{{currentJob.executor_name }}</span>
-          </span>
-          <span style="margin-left: 3em; font-size: 0.8em;">任务编号: {{currentJob.task_no }}</span>
-          <span style="margin-left: 3em; font-size: 0.8em;">计划完成时间: {{currentJob.expect_end_time }}</span>
-        </el-row>
-        <el-row>
-          <el-col :span="19">
-            <span
-              style="font-size: 1.6em; font-weight: bolder;"
-            >{{ currentJob.task_name | ellipsis(showJobs) }}</span>
-          </el-col>
-          <el-col :span="4" class="detail_tag">
-            <el-tag
-              size="small"
-              :type="levelTag[currentJob.level]"
-              effect="dark"
-            >{{ currentJob.level_str }}</el-tag>
-            <el-tag
-              size="small"
-              :type="statusTag[currentJob.status]"
-              effect="dark"
-            >{{ currentJob.status_str }}</el-tag>
-          </el-col>
-        </el-row>
-        <el-row>
-          <span style="font-size: 0.8em;">
-            详细描述:
-            <span style="color: gray;">{{ currentJob.task_detail}}</span>
-          </span>
-        </el-row>
-        <el-row>
-          <el-col :span="11">
-            <span style="font-size: 0.8em;">关联需求: {{ currentJob.prd_no }}</span>
-          </el-col>
-          <el-col :span="4">
-            <span v-if="jobWarningTag(currentJob)" style="color: red; font-size: 1.1em;">
-              <i class="el-icon-warning"></i>
-              &nbsp;{{ jobWarningTag(currentJob) }}
-            </span>
-            <pre v-else style="margin:0; padding: 0;">&nbsp;</pre>
-          </el-col>
-          <el-col :span="7" style="text-align: right;">
+        <el-descriptions
+          :title="currentJob.task_name | ellipsis(showJobs)"
+          :column="4"
+          direction="vertical"
+          border
+        >
+          <template slot="extra">
             <el-button
               v-show="currentJob.status == 3"
               size="mini"
               type="danger"
               @click="modifyJob(4)"
-            >关闭</el-button>
+            >完成</el-button>
             <el-button
-              v-show="currentJob.status != 4"
+              v-show="currentJob.status != 4 && showJobs"
               size="mini"
               type="info"
               @click="modifyJob()"
@@ -125,8 +86,31 @@
               type="primary"
               @click="startTest()"
             >{{ showJobs ? '查看详情' : '任务列表' }}</el-button>
-          </el-col>
-        </el-row>
+          </template>
+          <el-descriptions-item label="责任人">{{currentJob.executor_name }}</el-descriptions-item>
+          <el-descriptions-item label="任务类型">{{ currentJob.type_str }}</el-descriptions-item>
+          <el-descriptions-item label="计划完成时间">{{ currentJob.expect_end_time }}</el-descriptions-item>
+          <el-descriptions-item label="属性标签">
+            <el-tag size="small" type="danger" effect="dark" v-show="jobWarningTag(currentJob)">
+              <i class="el-icon-warning"></i>
+              &nbsp;{{ jobWarningTag(currentJob) }}
+            </el-tag>
+            <el-tag
+              size="small"
+              :type="levelTag[currentJob.level]"
+              effect="dark"
+            >{{ currentJob.level_str }}</el-tag>
+            <el-tag
+              size="small"
+              :type="statusTag[currentJob.status]"
+              effect="dark"
+            >{{ currentJob.status_str }}</el-tag>
+          </el-descriptions-item>
+
+          <el-descriptions-item label="关联需求">{{currentJob.prd_no }}</el-descriptions-item>
+          <el-descriptions-item label="任务编号">{{currentJob.task_no }}</el-descriptions-item>
+          <el-descriptions-item label="任务描述">{{currentJob.task_detail }}</el-descriptions-item>
+        </el-descriptions>
       </div>
       <!-- 用例详情 -->
       <div>
@@ -134,10 +118,6 @@
         <el-col :span="7" v-if="!showJobs">
           <div class="case_list">
             <span class="title">用例列表</span>
-            <span>
-              共
-              <span style="color: dodgerblue;">{{ caseList ? caseList.length : 0 }}</span> 条用例
-            </span>
             <el-divider></el-divider>
             <el-table
               :data="caseList"
@@ -165,6 +145,15 @@
                 </template>
               </el-table-column>
             </el-table>
+            <!-- 分页 -->
+            <div style="text-align: right;">
+              <pagination
+                :count="case_count"
+                :page.sync="case_page"
+                :page_size.sync="case_page_size"
+                @function="getCaseList"
+              ></pagination>
+            </div>
           </div>
         </el-col>
         <el-col :span="1">
@@ -172,80 +161,54 @@
         </el-col>
         <!-- 用例详情 -->
         <el-col :span="16">
-          <div class="case_detail" v-if="currentCase.id">
-            <el-row>
-              <span style="color: orangered;">{{ currentCase.case.case_id }}</span>
-              <span style="margin-left: 2em; font-size: 0.8em;">
-                测试系统:
-                <span style="color: tomato;">{{ currentCase.case.client }}</span>
-              </span>
-              <span style="margin-left: 2em; font-size: 0.8em;">
-                功能模块:
-                <span style="color: tomato;">{{ currentCase.case.module }}</span>
-              </span>
-            </el-row>
-            <el-row>
-              <el-col :span="20">
-                <span
-                  style="font-size: 1.1em;"
-                >{{ currentCase.case.case_name | ellipsis(showJobs) }}</span>
-              </el-col>
-              <el-col :span="3" class="detail_tag">
-                <el-tag size="mini" type="primary">{{ currentCase.case.level_value }}</el-tag>
-                <el-tag v-show="currentCase.case.is_auto" size="mini" type="primary">A</el-tag>
-              </el-col>
-            </el-row>
-            <el-row>
-              <span style="font-size: 0.8em;">
-                用例描述:
-                <span style="color: gray;">{{ currentCase.case.description }}</span>
-              </span>
-            </el-row>
-            <!-- 测试步骤、结果 -->
-            <el-row>
-              <el-col :span="18" style="font-size: 0.8em;">
-                测试步骤:
-                <br />
-                <el-col :span="1">
-                  <pre style="margin:0; padding: 0;">&nbsp;</pre>
-                </el-col>
-                <el-col :span="22">
-                  <div class="case_step">{{ currentCase.case.step }}</div>
-                </el-col>
-              </el-col>
-              <el-col :span="6" style="font-size: 0.8em;">
-                <el-row>
-                  测试结果:
-                  <el-select
-                    :disabled="[4, 5].indexOf(currentJob.status) != -1"
-                    v-model="currentCase.case_status"
-                    filterable
-                    size="mini"
-                    style="width: 8em;"
-                  >
-                    <el-option
-                      v-for="item in case_statusList"
-                      :key="item[0]"
-                      :label="item[1]"
-                      :value="item[0]"
-                      :disabled="item[0] == 0"
-                    ></el-option>
-                  </el-select>
-                </el-row>
-                <el-row style="margin-top:2em;">
-                  <el-button
-                    :disabled="[4, 5].indexOf(currentJob.status) != -1"
-                    size="mini"
-                    type="primary"
-                    @click="submitTestResult()"
-                  >确 定</el-button>
-                </el-row>
-              </el-col>
-            </el-row>
+          <div class="case_detail" v-if="!showJobs && currentCase.id">
+            <el-descriptions
+              :title="currentCase.case.case_name | ellipsis(showJobs)"
+              size="small"
+              border
+            >
+              <template slot="extra">
+                测试结果:
+                <el-select
+                  :disabled="[4, 5].indexOf(currentJob.status) != -1"
+                  v-model="currentCase.case_status"
+                  filterable
+                  size="mini"
+                  style="width: 7em; margin-right: 2em;"
+                >
+                  <el-option
+                    v-for="item in case_statusList"
+                    :key="item[0]"
+                    :label="item[1]"
+                    :value="item[0]"
+                    :disabled="item[0] == 0"
+                  ></el-option>
+                </el-select>
+                <el-button
+                  :disabled="[4, 5].indexOf(currentJob.status) != -1"
+                  size="mini"
+                  type="primary"
+                  @click="submitTestResult()"
+                >确 定</el-button>
+              </template>
+              <el-descriptions-item label="用例编号">{{ currentCase.case.case_id }}</el-descriptions-item>
+              <el-descriptions-item label="用例描述">{{ currentCase.case.description }}</el-descriptions-item>
+              <el-descriptions-item label="属性标签">
+                <el-tag size="mini" type="primary" effect="dark">{{ currentCase.case.level_value }}</el-tag>
+                <el-tag v-show="currentCase.case.is_auto" size="mini" type="primary" effect="dark">A</el-tag>
+              </el-descriptions-item>
+
+              <el-descriptions-item label="系统">{{ "系统名称" }}</el-descriptions-item>
+              <el-descriptions-item label="一级模块">{{ "一级模块" }}</el-descriptions-item>
+              <el-descriptions-item label="二级模块">{{ "二级模块" }}</el-descriptions-item>
+
+              <el-descriptions-item label="预期结果" :span="3">{{ "预期结果" }}</el-descriptions-item>
+              <el-descriptions-item label="测试步骤" :span="3">{{ currentCase.case.step }}</el-descriptions-item>
+            </el-descriptions>
           </div>
           <!-- 富文本编辑器 -->
           <editor
-            v-show="currentJob.status != 4 && currentCase.id"
+            v-show="!showJobs && currentJob.status != 4 && currentCase.id"
             :value.sync="currentCase.test_detail"
             ref="richText"
           ></editor>
@@ -308,9 +271,12 @@ export default {
       type: 0,
 
       // 分页
-      count: 0,
-      page: 1,
-      page_size: 15,
+      job_count: 0,
+      job_page: 1,
+      job_page_size: 15,
+      case_count: 0,
+      case_page: 1,
+      case_page_size: 15,
 
       // 当前选中的任务对象、用例列表
       currentJob: {},
@@ -325,14 +291,9 @@ export default {
   methods: {
     // 获取当前登陆人员的测试任务
     getJobList() {
-      let status = "";
-      if ((this.page, this.page_size, this.type == 0)) {
-        status = "finish";
-        this.type = 1;
-      } else {
-        status = "unfinish";
-        this.type = 0;
-      }
+      let status = this.type == 0 ? "finish" : "unfinish";
+      this.type = this.type == 0 ? 1 : 0;
+      // 加载任务列表
       this.loadJobList(status);
     },
 
@@ -340,9 +301,9 @@ export default {
     loadJobList(status) {
       this.loading = true;
 
-      job_list(this.page, this.page_size, status).then(res => {
+      job_list(this.job_page, this.job_page_size, status).then(res => {
         this.jobList = res.data.results;
-        this.count = res.data.count;
+        this.job_count = res.data.count;
         if (this.jobList[0]) {
           this.currentJob = this.jobList[0];
         } else {
@@ -372,20 +333,32 @@ export default {
     startTest() {
       this.showJobs = !this.showJobs;
 
+      // 还原页码
+      this.case_page = 1;
+      this.getCaseList();
+    },
+
+    // 获取用例列表
+    getCaseList() {
+      // 清空用例列表及详情
+      this.caseList = [];
+      this.currentCase = {};
+
       if (!this.showJobs) {
         this.loading = true;
         // 关闭任务列表则加载用例列表
-        job_case_detail(this.currentJob.id).then(res => {
-          this.caseList = res.data;
+        job_case_detail(
+          this.case_page,
+          this.case_page_size,
+          this.currentJob.id
+        ).then(res => {
+          this.caseList = res.data.results;
+          this.case_count = res.data.count;
           this.loading = false;
 
           this.currentCase = JSON.parse(JSON.stringify(this.caseList[0]));
         });
       } else {
-        // 清空用例列表及详情
-        this.caseList = [];
-        this.currentCase = {};
-
         // 清空可能未使用的图片
         this.$refs.richText.clearAllImage();
       }
@@ -494,7 +467,7 @@ export default {
     // 过滤器中不能使用this,所以showJobs参数是在调用时一起传过来的
     ellipsis(value, showJobs) {
       if (!value) return "";
-      let num = showJobs ? 20 : 30;
+      let num = showJobs ? 25 : 30;
       if (value.length > num) {
         return value.slice(0, num) + " ...";
       }
@@ -504,63 +477,50 @@ export default {
 };
 </script>
 <style scoped>
-.title span {
+.el-tag {
+  margin: 0 0.5em;
+}
+.el-divider {
+  margin: 0.5em 0;
+  background-color: tomato;
+  padding: 1px 0;
+}
+/deep/ .el-table__body tr.current-row > td {
+  background-color: #3b7ec5 !important;
+  color: whitesmoke;
+}
+/deep/ .el-table--enable-row-hover .el-table__body tr:hover > td {
+  background: #609fe2 !important;
+  color: whitesmoke;
+}
+
+.job_list {
+  background-color: gainsboro;
+  padding: 0.5em 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
+}
+.job_list .title {
   font-size: 1.2em;
   color: rgb(49, 119, 189);
   font-weight: bolder;
   margin: 0.2em 1em;
 }
-
-.title .el-divider {
-  margin: 0.5em 0;
-  background-color: tomato;
-  padding: 1px 0;
-}
-
-.job_list {
-  background-color: silver;
-  padding: 0.5em 0;
-  border: 1px solid silver;
-}
-
-.job_list .el-tag {
-  margin: 0 0.5em;
-}
 .job_list .el-table {
-  font-size: 1em;
-  height: 40em !important;
-  overflow: auto;
+  border: 1px solid gainsboro;
 }
-/deep/ .el-table__body tr.current-row > td {
-  background-color: #355e8a !important;
-  color: whitesmoke;
-}
-/deep/ .el-table--enable-row-hover .el-table__body tr:hover > td {
-  background: #608fc2 !important;
-  color: whitesmoke;
-}
-
 .job_detail {
   padding: 0.5em;
-  background-color: #dce2f1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
 }
-.job_detail .el-row {
-  margin: 0.5em 0;
-  line-height: 2em;
-  height: 2em;
-}
-.job_detail .detail_tag {
-  text-align: center;
-}
-.job_detail .detail_tag .el-tag {
-  margin: 0 0.5em;
+.job_detail /deep/ .el-descriptions__title {
+  font-size: 1.5em;
 }
 
 .case_list {
   margin: 0.5em 0;
-  background-color: silver;
+  background-color: gainsboro;
   padding: 0.5em 0;
-  border: 1px solid silver;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
 }
 .case_list .title {
   font-size: 1.2em;
@@ -568,15 +528,9 @@ export default {
   font-weight: bolder;
   margin: 0.2em 1em;
 }
-.case_list .el-divider {
-  margin: 0.5em 0;
-  background-color: tomato;
-  padding: 1px 0;
-}
+
 .case_list .el-table {
   font-size: 0.8em;
-  height: 55em !important;
-  overflow: auto;
 }
 .case_list /deep/ .el-table td {
   line-height: 2em;
@@ -589,39 +543,24 @@ export default {
   /* 外层高度自适应内层变化.不指定height为自适应,加了之后会滚动显示超出部分 */
   overflow: auto;
   padding: 0.5em;
-  background-color: #ebebe4;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
 }
-.case_detail .el-row {
-  margin: 0.3em 0;
-  line-height: 1.5em;
-  height: 1.5em;
-}
-.case_detail .el-row .el-tag {
-  margin: 0 0.5em;
-}
-.case_detail .case_step {
-  height: 8em;
-  margin: 0 1em;
-  padding: 0 1em;
-  overflow: auto;
-  background-color: whitesmoke;
-}
+
 .results {
-  border-radius: 0.5em;
   padding: 1em;
   margin-top: 1.5em;
-  background-color: whitesmoke;
   height: 30em;
   overflow: auto;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
 }
 .results .banner {
   font-size: 1.5em;
   font-weight: bolder;
   text-align: center;
   padding: 0;
-  margin: 0.5em 0;
+  margin: 0.2em 0;
 }
 .results >>> img {
-  max-height: 15em;
+  max-height: 12em;
 }
 </style>

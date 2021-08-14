@@ -18,7 +18,7 @@ class JobSerializer(serializers.ModelSerializer):
     # case_list = CaseSerializer(source='case', read_only=True, many=True)
 
     # 时间字段格式化
-    create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False)
+    create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S')
     expect_end_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S')
     actual_end_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', allow_null=True, required=False)
 
@@ -34,7 +34,7 @@ class JobSerializer(serializers.ModelSerializer):
     class Meta:
         model = Job
         fields = '__all__'
-        read_only_fields = ('id', 'task_no', 'create_user')
+        read_only_fields = ('id', 'task_no', 'create_user', 'create_time')
 
     def validate(self, attrs):
         # 相同名称的任务不允许创建

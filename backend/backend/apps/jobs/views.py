@@ -103,8 +103,6 @@ class JobListView(ListAPIView):
             task_no = valid_conditions.pop('task_no', "")
             task_name = valid_conditions.pop('task_name', "")
 
-            print(valid_conditions)
-
             instance = Job.objects.filter(**valid_conditions, task_name__contains=task_name,
                                           task_no__icontains=task_no).order_by('expect_end_time')
 

@@ -6,35 +6,37 @@ from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .serializers import ImageSerializer
 from .models import Image
+from .serializer import SystemImageSerializer
 from backend.utils.fastdfs.FastDFSStorage import FastDFSStorage
 
 
-class UploadImageView(CreateAPIView):
-    """图片上传视图"""
-
-    serializer_class = ImageSerializer
-
-
-class SystemImageUrlView(APIView):
+class SystemImageView(APIView):
     """图片链接视图"""
 
     permission_classes = []
 
-    def get(self, request):
-        # 提取参数
-        location = request.query_params.get('location')
+    def get(self, request, scope):
+        # 映射关系
+        map_scope = {
+            'login': 0,
+            'home': 1,
+            'case': 2,
+            'job': 3
+        }
 
         # 查询集
         try:
-            query = Image.objects.get(location=location)
+            querySet = Image.objects.filter(scope=map_scope[scope])
         except Image.DoesNotExist:
             return Response({'msg': '图片信息不存在'}, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            serializer = ImageSerializer(query)
 
-            return Response(serializer.data)
+        serializer = SystemImageSerializer(instance=querySet, many=True)
+        image = dict()
+        for data in serializer.data:
+            image[data['name']] = data['image']
+
+        return Response(image)
 
 
 class ImageView(APIView):

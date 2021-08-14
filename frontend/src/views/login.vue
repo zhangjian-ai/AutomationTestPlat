@@ -45,6 +45,7 @@ export default {
     return {
       // 背景图链接
       url: "",
+
       // 注册登陆切换
       title: ["用 户 登 陆", "用 户 注 册"],
       titleLink: ["立即注册", "已有账号"],
@@ -92,8 +93,8 @@ export default {
     },
     // 加载Image
     loadImage() {
-      get_image("登陆页面").then(res => {
-        this.url = res.data.image;
+      get_image("login").then(res => {
+        this.url = res.data.background;
       });
     }
   },
@@ -125,7 +126,7 @@ export default {
   left: 36%;
   top: 15%;
   border-radius: 5px;
-  background-color: rgba(245, 245, 245, 0.7);
+  background-color: rgba(245, 245, 245, 0.5);
   width: 24em;
 }
 .sub_box {

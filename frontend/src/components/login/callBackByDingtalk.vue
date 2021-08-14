@@ -80,8 +80,8 @@ export default {
 
     // 加载image
     loadImage() {
-      get_image("加载中").then(res => {
-        this.url = res.data.image;
+      get_image("login").then(res => {
+        this.url = res.data.loading;
       });
     }
   },

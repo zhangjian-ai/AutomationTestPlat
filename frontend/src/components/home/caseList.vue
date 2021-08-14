@@ -121,8 +121,8 @@
       <el-table-column prop="level_value" label="优先级" width="60" align="center"></el-table-column>
       <el-table-column label="自动化" width="60" align="center">
         <template slot-scope="scope">
-          <el-image v-if="scope.row.is_auto" :src="currect_url" style="width: 1.2em; height: 1.2em;"></el-image>
-          <el-image v-else :src="error_url" style="width: 1.2em; height: 1.2em;"></el-image>
+          <el-image v-if="scope.row.is_auto" :src="true_url"></el-image>
+          <el-image v-else :src="false_url"></el-image>
         </template>
       </el-table-column>
       <el-table-column prop="owner" label="OWNER" width="100" align="center"></el-table-column>
@@ -252,8 +252,8 @@ export default {
       page_size: 15,
 
       //  图标
-      currect_url: "",
-      error_url: "",
+      true_url: "",
+      false_url: "",
 
       // 用例抽屉的变量
       showDrawer: false,
@@ -383,11 +383,9 @@ export default {
 
     // 加载Image
     loadImage() {
-      get_image("正确图标").then(res => {
-        this.currect_url = res.data.image;
-      });
-      get_image("错误图标").then(res => {
-        this.error_url = res.data.image;
+      get_image("case").then(res => {
+        this.false_url = res.data.false;
+        this.true_url = res.data.true;
       });
     },
 
@@ -437,6 +435,9 @@ export default {
   width: 100%;
   overflow: auto;
   margin: 1em 0;
+}
+.el-table .el-image {
+  height: 1.2em;
 }
 .el-drawer .form {
   width: 96%;

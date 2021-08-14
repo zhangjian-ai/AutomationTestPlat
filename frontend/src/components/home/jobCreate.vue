@@ -264,6 +264,7 @@ export default {
   background-color: rgb(214, 212, 212);
   height: 39em;
   margin-top: 3.5em;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
 }
 .el-tree {
   margin: 0.2em 0 0 0;
@@ -300,6 +301,7 @@ export default {
 .form {
   background-color: whitesmoke;
   padding: 1em 0 2em 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
 }
 .form .tips {
   font-size: 0.8em;

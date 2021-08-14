@@ -342,6 +342,7 @@ export default {
 .main .form {
   background-color: whitesmoke;
   padding: 1.5em 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
 }
 .el-input {
   width: 20em;

@@ -1,7 +1,7 @@
-from django.urls import path
+from django.urls import path, re_path
 from . import views
 
 urlpatterns = [
-    path('getImage/', views.SystemImageUrlView.as_view()),  # 账号注册
-    path('uploadImage/', views.ImageView.as_view()),
+    re_path('getImage/(?P<scope>[a-z]+)/', views.SystemImageView.as_view()),
+    path('image/', views.ImageView.as_view()),
 ]

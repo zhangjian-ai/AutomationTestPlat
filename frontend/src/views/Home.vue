@@ -78,8 +78,8 @@ export default {
 
     // 加载Image
     loadImage() {
-      get_image("LOGO").then(res => {
-        this.url = res.data.image;
+      get_image("home").then(res => {
+        this.url = res.data.logo;
       });
     }
   },

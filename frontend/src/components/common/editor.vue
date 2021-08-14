@@ -68,7 +68,7 @@ export default {
     return {
       content: "",
       editorOption: {
-        theme: "snow", 
+        theme: "snow",
         placeholder: "记录您的测试结果",
         modules: {
           toolbar: {
@@ -203,7 +203,6 @@ export default {
 <style>
 .editor {
   line-height: normal !important;
-  height: 28em;
   margin-top: -2em;
   /* 解决空格被删除的问题 */
   white-space: pre-wrap;

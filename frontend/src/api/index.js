@@ -19,7 +19,7 @@ export const check_user = param => { return axios.get('/userCount/', { params: {
 export const user_list = (param = null) => { return axios.get('/userList/', { params: { param: param } }) }
 
 // 获取系统图片资源链接
-export const get_image = location => { return axios.get('/getImage/', { params: { location: location } }) }
+export const get_image = scope => { return axios.get(`/getImage/${scope}/`) }
 
 // 登陆
 export const login = data => { return axios.post('/login/', data) }
@@ -76,13 +76,13 @@ export const dispatch_job = data => { return axios.put('/dispatchJob/', data) }
 export const job_list_detail = param => { return axios.get(`/jobListDetail/${param}/`) }
 
 // 获取测试任务中的用例详情
-export const job_case_detail = id => { return axios.get(`/jobCaseDetail/${id}/`) }
+export const job_case_detail = (page, page_size, id) => { return axios.get(`/jobCaseDetail/${id}/`, { params: { page: page, page_size: page_size } }) }
 
 // 上传图片
-export const uploadImage = data => { return axios.post('/uploadImage/', data) }
+export const uploadImage = data => { return axios.post('/image/', data) }
 
 // 删除图片
-export const deleteRemoteImage = url => { return axios.delete('/uploadImage/', { data: { url: url } }) }
+export const deleteRemoteImage = url => { return axios.delete('/image/', { data: { url: url } }) }
 
 // 保存测试结果
 export const saveTestResult = data => { return axios.post('/testResult/', data) }

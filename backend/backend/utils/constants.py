@@ -7,6 +7,11 @@ SMS_CODE_INTERVAL = 60
 # 测试短信模板ID
 SMS_TEMPLATE_ID = 1
 
+# 系统图片使用位置分类
+IMAGE = {
+    'SCOPE': [(0, 'login'), (1, 'home'), (2, 'case'), (3, 'job')]
+}
+
 # 测试用例常量
 CASE = {
     'LEVEL': [("H", '高'), ("M", '中'), ("L", '低')]

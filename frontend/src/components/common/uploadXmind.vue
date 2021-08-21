@@ -85,16 +85,14 @@ export default {
       // 能够复用el-upload原生的一些动作
       const res = await uploadXmindCase(form);
       // 同步操作
-      (() => {
-        this.show = true;
-        this.loading = false;
-        if (res.status == 201) {
-          file.onSuccess(res);
-        }
-        if (res.status == 200) {
-          file.onError(res);
-        }
-      })();
+      this.show = true;
+      this.loading = false;
+      if (res.status == 201) {
+        file.onSuccess(res);
+      }
+      if (res.status == 200) {
+        file.onError(res);
+      }
     },
 
     // 确认提交
@@ -150,7 +148,7 @@ export default {
       this.success = "";
       this.count = 0;
       this.show = false;
-    },
+    }
   }
 };
 </script>

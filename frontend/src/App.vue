@@ -31,7 +31,7 @@ html,
   width: 100%;
 }
 
-/* 统一修改消息弹框样式 */
+/* 全局修改消息弹框样式 */
 .el-message {
   top: 30px !important;
   min-width: 5em !important;
@@ -40,5 +40,27 @@ html,
 }
 .el-message .el-message__content {
   font-size: 1em;
+}
+
+/* 全局修改级联选择器样式 */
+.el-cascader-panel .el-radio {
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+.el-cascader-panel .el-radio__input {
+  visibility: hidden;
+}
+.el-cascader-panel .el-cascader-node__postfix {
+  top: 10px;
+}
+
+/* 全局设置下拉框最大高度 */
+.el-select-dropdown__list {
+  max-height: 15em;
+  overflow: auto;
 }
 </style>

@@ -61,7 +61,7 @@
   </el-container>
 </template>
 <script>
-import { get_image } from "@/api";
+import { get_image, modules, user_list, get_constants } from "@/api";
 export default {
   data() {
     return {
@@ -81,10 +81,30 @@ export default {
       get_image("home").then(res => {
         this.url = res.data.logo;
       });
+      get_image("case").then(res => {
+        this.$store.commit("setCaseIcons", res.data);
+      });
+    },
+
+    // 加载搜索栏下拉框
+    loadOption() {
+      modules().then(res => {
+        this.$store.commit("setModules", res.data);
+      });
+      get_constants("CASE").then(res => {
+        this.$store.commit("setPriorities", res.data.LEVEL);
+      });
+      get_constants("JOB").then(res => {
+        this.$store.commit("setJobInfo", res.data);
+      });
+      user_list().then(res => {
+        this.$store.commit("setUsers", res.data);
+      });
     }
   },
   mounted() {
     this.loadImage();
+    this.loadOption();
   }
 };
 </script>
@@ -97,7 +117,6 @@ export default {
   text-align: center;
   width: 12% !important;
 }
-
 .el-aside .el-menu {
   width: 100%;
   height: 100%;
@@ -122,7 +141,7 @@ export default {
   text-align: right;
 }
 .header span {
-  color: rgb(168, 109, 0);
+  color: #ee7700;
   font-weight: bolder;
 }
 .header .el-breadcrumb {

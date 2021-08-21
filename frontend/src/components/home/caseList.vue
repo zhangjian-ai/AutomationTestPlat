@@ -12,24 +12,24 @@
           <el-row>
             <el-col :span="6">
               <el-form-item label="用例编号:">
-                <el-input v-model="conditions.case_id" placeholder="用例编号" clearable></el-input>
+                <el-input v-model="conditions.no" clearable></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item label="用例名称:">
-                <el-input v-model="conditions.case_name" placeholder="用例名称" clearable></el-input>
+                <el-input v-model="conditions.name" clearable></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="6">
-              <el-form-item label="owner:">
-                <el-input v-model="conditions.owner" placeholder="owner" clearable></el-input>
+              <el-form-item label="AUTHOR:">
+                <el-input v-model="conditions.author" clearable placeholder="用户昵称"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item label="优先级:">
-                <el-select v-model="conditions.level" placeholder="优先级" clearable>
+                <el-select v-model="conditions.priority" clearable>
                   <el-option
-                    v-for="item in levels"
+                    v-for="item in $store.state.priorities"
                     :key="item[0]"
                     :label="item[1]"
                     :value="item[0]"
@@ -40,45 +40,43 @@
           </el-row>
           <el-row>
             <el-col :span="6">
-              <el-form-item label="应用名称:">
-                <el-select v-model="conditions.client_id" placeholder="应用名称" clearable>
-                  <el-option
-                    v-for="item in clients"
-                    :key="item.id"
-                    :label="item.name"
-                    :value="item.id"
-                  ></el-option>
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="6">
               <el-form-item label="功能模块:">
-                <el-select v-model="conditions.module_id" placeholder="功能模块名称" clearable>
-                  <el-option
-                    v-for="item in modules"
-                    :key="item.id"
-                    :label="item.name"
-                    :value="item.id"
-                  ></el-option>
-                </el-select>
+                <el-cascader
+                  v-model="conditions.module"
+                  :options="$store.state.modules"
+                  expandTrigger="hover"
+                  :props="{ checkStrictly: true, emitPath: false, value: 'id', label: 'name', children: 'subs'}"
+                  @change="handleChange"
+                  ref="cascader"
+                  clearable
+                ></el-cascader>
               </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item label="自动化:">
-                <el-select v-model="conditions.is_auto" placeholder="实现自动化" clearable>
+                <el-select v-model="conditions.is_auto" clearable>
                   <el-option label="是" :value="true"></el-option>
                   <el-option label="否" :value="false"></el-option>
                 </el-select>
               </el-form-item>
             </el-col>
+            <el-col :span="6">
+              <el-form-item label="创建时间:">
+                <el-date-picker
+                  v-model="conditions.code_time"
+                  type="datetimerange"
+                  range-separator="-"
+                  start-placeholder="开始时间"
+                  end-placeholder="结束时间"
+                  value-format="yyyy-MM-dd HH:mm:ss"
+                ></el-date-picker>
+              </el-form-item>
+            </el-col>
           </el-row>
         </el-form>
-        <!-- 用例操作 -->
+        <!-- 查询操作 -->
         <el-row>
-          <el-col :span="2" style="text-align: left; padding-left:1.5em;">
-            <el-button type="danger" icon="el-icon-plus" size="mini">先占个位</el-button>
-          </el-col>
-          <el-col :span="22">
+          <el-col :span="24">
             <el-button
               type="primary"
               icon="el-icon-search"
@@ -86,56 +84,46 @@
               @click="getCasesByQuery()"
               native-type="submit"
             >查询</el-button>
-            <el-button
-              type="warning"
-              icon="el-icon-refresh-left"
-              size="mini"
-              @click="conditions = {}"
-            >重置</el-button>
+            <el-button type icon="el-icon-refresh-left" size="mini" @click="conditions = {}">重置</el-button>
           </el-col>
         </el-row>
       </div>
     </div>
-    <!-- 信息展示区 -->
+    <!-- 用例列表展示 -->
     <el-table
       :data="caseList"
-      stripe
       v-loading="loading"
-      border
-      height="48em"
+      max-height="54.3em"
       size="mini"
       :header-cell-style="{background:'#eef1f6',color:'#606266', 'text-align': 'center'}"
     >
       <el-table-column type="selection" align="center"></el-table-column>
-      <el-table-column label="序号" type="index" width="50" align="center"></el-table-column>
-      <el-table-column prop="case_id" label="用例编号" width="200"></el-table-column>
-      <el-table-column
-        prop="case_name"
-        label="用例名称"
-        width="220"
-        align="center"
-        show-overflow-tooltip
-      ></el-table-column>
-      <el-table-column prop="client" label="应用" width="100" align="center"></el-table-column>
-      <el-table-column prop="module" label="功能模块" width="120" align="center"></el-table-column>
-      <el-table-column prop="level_value" label="优先级" width="60" align="center"></el-table-column>
-      <el-table-column label="自动化" width="60" align="center">
+      <el-table-column label="序号" type="index" min-width="50%" align="center"></el-table-column>
+      <el-table-column prop="no" label="用例编号" min-width="200%" align="center"></el-table-column>
+      <el-table-column prop="name" label="用例名称" min-width="250%" align="center"></el-table-column>
+      <el-table-column label="功能模块" min-width="200%">
+        <template
+          slot-scope="scope"
+        >{{ (scope.row.module_str1 ? scope.row.module_str1 + " / " : "") + (scope.row.module_str2 ? scope.row.module_str2 + " / " : "") + (scope.row.module_str3 ? scope.row.module_str3 : "") }}</template>
+      </el-table-column>
+      <el-table-column prop="priority_str" label="优先级" min-width="60%" align="center"></el-table-column>
+      <el-table-column label="自动化" min-width="60%" align="center">
         <template slot-scope="scope">
-          <el-image v-if="scope.row.is_auto" :src="true_url"></el-image>
-          <el-image v-else :src="false_url"></el-image>
+          <el-image v-if="scope.row.is_auto" :src="$store.state.correct"></el-image>
+          <el-image v-else :src="$store.state.error"></el-image>
         </template>
       </el-table-column>
-      <el-table-column prop="owner" label="OWNER" width="100" align="center"></el-table-column>
-      <el-table-column prop="add_time" label="用例编写时间" width="150" align="center"></el-table-column>
-      <el-table-column label="操作" align="center" width="125">
+      <el-table-column prop="author" label="AUTHOR" min-width="100%" align="center"></el-table-column>
+      <el-table-column prop="code_time" label="用例编写时间" min-width="150%" align="center"></el-table-column>
+      <el-table-column label="操作" align="center" min-width="90%">
         <template slot-scope="scope">
-          <el-button icon="el-icon-edit" circle size="mini" @click="openDrawer(scope.row)"></el-button>
+          <el-button icon="el-icon-edit" circle size="mini" @click="openDrawer(scope.row.id)"></el-button>
           <el-button
             icon="el-icon-delete"
             style="color: red;"
             circle
             size="mini"
-            @click="deleteCase(scope.row)"
+            @click="deleteCase(scope.row.id)"
           ></el-button>
         </template>
       </el-table-column>
@@ -145,7 +133,7 @@
       <pagination :count="count" :page.sync="page" :page_size.sync="page_size" @function="getCases"></pagination>
     </el-row>
     <!-- 用例详情抽屉 -->
-    <el-drawer :visible.sync="showDrawer" size="40%" :wrapperClosable="false" direction="rtl">
+    <el-drawer :visible.sync="showDrawer" size="45%" :wrapperClosable="false" direction="rtl">
       <div slot="title" style="font-size: 1.2em; color: black;">用例详情</div>
       <div class="form">
         <el-form :model="caseForm" size="mini" label-width="10em" ref="caseForm" :rules="rules">
@@ -153,47 +141,35 @@
             <el-input v-model="caseForm.id" disabled style="width: 6em;"></el-input>
           </el-form-item>
           <el-form-item label="用例编号:">
-            <el-input v-model="caseForm.case_id" disabled></el-input>
+            <el-input v-model="caseForm.no" disabled></el-input>
           </el-form-item>
-          <el-form-item label="用例名称:" prop="case_name">
-            <el-input v-model="caseForm.case_name"></el-input>
+          <el-form-item label="用例名称:" prop="name">
+            <el-input v-model="caseForm.name"></el-input>
           </el-form-item>
-          <el-form-item label="应用名称:" prop="client_id">
-            <el-select v-model="caseForm.client_id">
-              <el-option v-for="item in clients" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          <el-form-item label="AUTHOR:" prop="author">
+            <el-input v-model="caseForm.author" disabled></el-input>
+          </el-form-item>
+          <el-form-item label="功能模块:" prop="module">
+            <el-cascader
+              v-model="caseForm.module"
+              :options="$store.state.modules"
+              expandTrigger="hover"
+              :props="{ checkStrictly: true, emitPath: false, value: 'id', label: 'name', children: 'subs'}"
+              @change="handleChange"
+              ref="cascader"
+              clearable
+              style="width: 20em;"
+            ></el-cascader>
+          </el-form-item>
+          <el-form-item label="优先级:" prop="priority">
+            <el-select v-model="caseForm.priority">
+              <el-option
+                v-for="item in $store.state.priorities"
+                :key="item[0]"
+                :label="item[1]"
+                :value="item[0]"
+              ></el-option>
             </el-select>
-          </el-form-item>
-          <el-form-item label="功能模块:" prop="module_id">
-            <el-select v-model="caseForm.module_id">
-              <el-option v-for="item in modules" :key="item.id" :label="item.name" :value="item.id"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="用例描述:">
-            <el-input
-              type="textarea"
-              :autosize="{ minRows: 1, maxRows: 3 }"
-              v-model="caseForm.description"
-              style="width: 25em;"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="测试步骤:">
-            <el-input
-              type="textarea"
-              v-model="caseForm.step"
-              :autosize="{ minRows: 2, maxRows: 5 }"
-              style="width: 25em;"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="优先级:" prop="level">
-            <el-select v-model="caseForm.level">
-              <el-option v-for="item in levels" :key="item[0]" :label="item[1]" :value="item[0]"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="owner:" prop="owner">
-            <el-input v-model="caseForm.owner" style="width: 8em;" disabled></el-input>
-          </el-form-item>
-          <el-form-item label="更新人:">
-            <el-input v-model="caseForm.updater" style="width: 8em;"></el-input>
           </el-form-item>
           <el-form-item label="自动化:" prop="is_auto">
             <el-select v-model="caseForm.is_auto">
@@ -201,11 +177,44 @@
               <el-option label="否" :value="false"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item v-if="caseForm.is_auto" label="自动化脚本路径:" prop="exec_path">
-            <el-input v-model="caseForm.exec_path" style="width: 30em;"></el-input>
+          <el-form-item v-if="caseForm.is_auto" label="自动化脚本路径:" prop="path">
+            <el-input v-model="caseForm.path"></el-input>
+          </el-form-item>
+          <el-form-item v-show="caseForm.is_auto" label="自动化版本:">
+            <el-input v-model="caseForm.version"></el-input>
+          </el-form-item>
+          <el-form-item v-show="caseForm.is_auto" label="自动化类型:">
+            <el-input v-model="caseForm.type"></el-input>
+          </el-form-item>
+          <el-form-item label="用例描述:">
+            <el-input
+              type="textarea"
+              :autosize="{ minRows: 1, maxRows: 2 }"
+              v-model="caseForm.description"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="测试步骤:">
+            <el-input
+              type="textarea"
+              v-model="caseForm.step"
+              :autosize="{ minRows: 2, maxRows: 5 }"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="预期结果:">
+            <el-input
+              type="textarea"
+              v-model="caseForm.expectation"
+              :autosize="{ minRows: 1, maxRows: 2 }"
+            ></el-input>
           </el-form-item>
           <el-form-item label="创建时间:">
-            <el-input v-model="caseForm.add_time" disabled></el-input>
+            <el-input v-model="caseForm.code_time" disabled></el-input>
+          </el-form-item>
+          <el-form-item v-show="caseForm.reviser" label="最近修改时间:">
+            <el-input v-model="caseForm.update_time" disabled></el-input>
+          </el-form-item>
+          <el-form-item v-show="caseForm.reviser" label="修改人:">
+            <el-input v-model="caseForm.reviser_str" disabled></el-input>
           </el-form-item>
         </el-form>
         <div style="text-align: right; margin-right: 2em; margin-top: 2em;">
@@ -218,15 +227,7 @@
 </template>
 <script>
 import pagination from "../common/pagination.vue";
-import {
-  clients,
-  modules,
-  case_list,
-  get_image,
-  modify_case,
-  delete_case,
-  get_constants
-} from "@/api";
+import { case_list, query_case, modify_case, delete_case } from "@/api";
 export default {
   data() {
     return {
@@ -236,13 +237,6 @@ export default {
       //   查询条件
       conditions: {},
 
-      //  应用和模块列表
-      clients: [],
-      modules: [],
-
-      // 用例等级
-      levels: [],
-
       //  加载中
       loading: false,
 
@@ -251,47 +245,30 @@ export default {
       page: 1,
       page_size: 15,
 
-      //  图标
-      true_url: "",
-      false_url: "",
-
       // 用例抽屉的变量
       showDrawer: false,
 
       // 用例信息
+      resData: {},
       caseForm: {},
 
       // 表单校验规则
       rules: {
-        case_name: [
+        name: [
           {
             required: true,
             message: "该项为必填",
             trigger: "blur"
           }
         ],
-        client_id: [
+        module: [
           {
             required: true,
             message: "该项为必填",
             trigger: "blur"
           }
         ],
-        module_id: [
-          {
-            required: true,
-            message: "该项为必填",
-            trigger: "blur"
-          }
-        ],
-        level: [
-          {
-            required: true,
-            message: "该项为必填",
-            trigger: "blur"
-          }
-        ],
-        owner: [
+        priority: [
           {
             required: true,
             message: "该项为必填",
@@ -305,7 +282,7 @@ export default {
             trigger: "blur"
           }
         ],
-        exec_path: [
+        path: [
           {
             required: true,
             message: "该项为必填",
@@ -328,7 +305,7 @@ export default {
       });
     },
 
-    // 通过查询按钮查询用例
+    // 通过查询按钮查询用例列表
     getCasesByQuery() {
       // 重置当前页
       this.page = 1;
@@ -337,10 +314,17 @@ export default {
     },
 
     // 打开用例抽屉。查看或者修改
-    openDrawer(form) {
+    openDrawer(id) {
       this.showDrawer = true;
-      // 深拷贝表单数据
-      this.caseForm = JSON.parse(JSON.stringify(form));
+      // 重置表单
+      this.caseForm = {};
+      // 获取用例详情
+      query_case(id).then(res => {
+        // Object.assign(res.data.base, res.data.detail);
+        // 深拷贝表单数据
+        this.caseForm = JSON.parse(JSON.stringify(res.data));
+        this.resData = JSON.parse(JSON.stringify(res.data));
+      });
     },
 
     // 用例修改保存
@@ -352,25 +336,44 @@ export default {
             cancelButtonText: "取消",
             type: "warning"
           }).then(() => {
-            modify_case(this.caseForm).then(res => {
+            // 筛选出修改的项
+            let form = {};
+            for (let key in this.caseForm) {
+              if (this.caseForm[key] != this.resData[key]) {
+                form[key] = this.caseForm[key];
+              }
+            }
+            if (JSON.stringify(form) == "{}") {
               this.$message({
-                type: "success",
-                message: res.data.msg
+                type: "info",
+                message: "未作修改 何必保存"
               });
-            });
+            } else {
+              // 发起修改
+              form.id = this.caseForm.id;
+              modify_case(form).then(res => {
+                this.$message({
+                  type: "success",
+                  message: res.data.msg
+                });
+                // 刷新用例列表并关闭抽屉
+                this.getCases();
+                this.showDrawer = false;
+              });
+            }
           });
         }
       });
     },
 
     // 删除用例
-    deleteCase(form) {
+    deleteCase(id) {
       this.$confirm("您即将删除本用例, 确认是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
       }).then(() => {
-        delete_case(form.id, form.case_id).then(res => {
+        delete_case(id).then(res => {
           this.$message({
             type: "success",
             message: res.data.msg
@@ -381,30 +384,13 @@ export default {
       });
     },
 
-    // 加载Image
-    loadImage() {
-      get_image("case").then(res => {
-        this.false_url = res.data.false;
-        this.true_url = res.data.true;
-      });
-    },
-
-    // 加载搜索栏下拉框、用例等级信息
-    loadOption() {
-      clients().then(res => {
-        this.clients = res.data;
-      });
-      modules().then(res => {
-        this.modules = res.data;
-      });
-      get_constants("CASE").then(res => {
-        this.levels = res.data.LEVEL;
-      });
+    // 级联选择器事件,选中节点变化时触发
+    handleChange() {
+      // 选择选项后,自动关闭下拉框
+      this.$refs.cascader.dropDownVisible = false;
     }
   },
   created() {
-    this.loadImage();
-    this.loadOption();
     this.getCases();
   },
   components: {
@@ -423,14 +409,22 @@ export default {
   text-align: right;
 }
 .condition /deep/ .el-form-item__label {
-  font-size: 0.9em !important;
+  font-size: 0.8em !important;
+  font-weight: 350;
 }
 .condition .el-input {
-  width: 14em;
+  width: 15em;
 }
 .condition .el-select {
-  width: 12em;
+  width: 12.8em;
 }
+.condition .el-cascader {
+  width: 15em;
+}
+.el-date-editor--datetimerange.el-input__inner {
+  width: 12.9em;
+}
+
 .el-table {
   width: 100%;
   overflow: auto;
@@ -441,14 +435,15 @@ export default {
 }
 .el-drawer .form {
   width: 96%;
-  font-size: 1.2em;
-  text-align: left;
   padding: 2%;
 }
 .el-drawer .el-input {
-  width: 20em;
+  width: 65%;
+}
+.el-drawer .el-form-item >>> .el-textarea__inner {
+  width: 80%;
 }
 .el-drawer .el-select {
-  width: 12em;
+  width: 25%;
 }
 </style>

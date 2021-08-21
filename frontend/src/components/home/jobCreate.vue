@@ -8,32 +8,41 @@
       </div>
       <div class="form">
         <span class="tips">&nbsp;创建任务提交之前请先勾选任务所需之用例</span>
-        <el-form :model="jobForm" label-width="10em" ref="jobForm" :rules="rules" size="mini">
+        <el-form :model="jobForm" label-width="25%" ref="jobForm" :rules="rules" size="mini">
           <el-form-item label="任务名称:" prop="task_name">
-            <el-input v-model="jobForm.task_name" class="task_name"></el-input>
+            <el-input v-model="jobForm.task_name"></el-input>
           </el-form-item>
           <el-form-item label="任务详情:">
             <el-input
               type="textarea"
               :autosize="{ minRows: 3, maxRows: 5 }"
               v-model="jobForm.task_detail"
-              style="width: 25em;"
             ></el-input>
           </el-form-item>
           <el-form-item label="优先级:" prop="level">
             <el-select v-model="jobForm.level">
-              <el-option v-for="item in levels" :key="item[0]" :label="item[1]" :value="item[0]"></el-option>
+              <el-option
+                v-for="item in $store.state.levels"
+                :key="item[0]"
+                :label="item[1]"
+                :value="item[0]"
+              ></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="任务类型:" prop="type">
             <el-select v-model="jobForm.type">
-              <el-option v-for="item in types" :key="item[0]" :label="item[1]" :value="item[0]"></el-option>
+              <el-option
+                v-for="item in $store.state.categories"
+                :key="item[0]"
+                :label="item[1]"
+                :value="item[0]"
+              ></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="责任人:">
             <el-select v-model="jobForm.executor" filterable clearable>
               <el-option
-                v-for="item in executors"
+                v-for="item in $store.state.users"
                 :key="item.id"
                 :label="item.nickname"
                 :value="item.id"
@@ -94,7 +103,7 @@
   </div>
 </template>
 <script>
-import { job_case_list, get_constants, user_list, create_job } from "@/api";
+import { job_case_list, create_job } from "@/api";
 export default {
   data() {
     return {
@@ -105,7 +114,8 @@ export default {
       treeData: [],
       defaultProps: {
         children: "subs",
-        label: "name"
+        label: "name",
+        disabled: "disabled"
       },
 
       // 创建任务表单、用例数组
@@ -142,12 +152,7 @@ export default {
             trigger: "blur"
           }
         ]
-      },
-
-      // 下拉框数据
-      levels: [],
-      types: [],
-      executors: []
+      }
     };
   },
   methods: {
@@ -167,7 +172,7 @@ export default {
 
     // 节点选中状态变化的绑定事件。这里用不上第三个参数，所以没有入参
     handleChange(data, self) {
-      if (data.type == "case") {
+      if (data.cate == "case") {
         if (self) {
           this.case.push(data.id);
         } else {
@@ -183,17 +188,6 @@ export default {
     // 清空已勾选的用例
     clearCaseList() {
       this.$refs.tree.setCheckedNodes(this.case);
-    },
-
-    // 加载下拉选项
-    loadOption() {
-      get_constants("JOB").then(res => {
-        this.levels = res.data.LEVEL;
-        this.types = res.data.TYPE;
-      });
-      user_list().then(res => {
-        this.executors = res.data;
-      });
     },
 
     // 创建提交
@@ -216,7 +210,8 @@ export default {
           }
         }
       });
-    }
+    },
+
   },
   watch: {
     // 过滤节点
@@ -246,7 +241,6 @@ export default {
   },
   mounted() {
     this.getCaseList();
-    this.loadOption();
   }
 };
 </script>
@@ -319,13 +313,13 @@ export default {
 .el-form-item {
   margin: 2em 0;
 }
-.form .task_name {
-  width: 25em !important;
+.el-form-item >>> .el-textarea__inner {
+  width: 80%;
 }
 .form .el-input {
-  width: 15em;
+  width: 80%;
 }
 .form .el-select {
-  width: 10em;
+  width: 30%;
 }
 </style>

@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 from cases.models import Case
 from .models import Job, JobToCase
-from cases.serializer import CaseSerializer
+from cases.serializer import SimpleCaseSerializer
 
 
 class JobSerializer(serializers.ModelSerializer):
@@ -18,7 +18,8 @@ class JobSerializer(serializers.ModelSerializer):
     # case_list = CaseSerializer(source='case', read_only=True, many=True)
 
     # 时间字段格式化
-    create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S')
+    create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False)
+    update_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False)
     expect_end_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S')
     actual_end_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', allow_null=True, required=False)
 
@@ -71,7 +72,7 @@ class JobToCaseSerializer(serializers.ModelSerializer):
 
     case_status_str = serializers.CharField(source='get_case_status_display', read_only=True)
     test_detail = serializers.CharField(allow_null=True, required=False)
-    case = CaseSerializer(read_only=True)
+    case = SimpleCaseSerializer(read_only=True)
 
     class Meta:
         model = JobToCase

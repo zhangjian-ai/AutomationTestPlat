@@ -1,5 +1,7 @@
 import json
+import random
 import time
+from datetime import datetime
 
 import xmindparser
 from django.db import transaction, DatabaseError
@@ -10,8 +12,8 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Client, Module, Case
-from .serializer import CaseSerializer, ClientSerializer, ModuleSerializer, JobClientSerializer
+from .models import Module, Case
+from .serializer import CaseSerializer, ModuleSerializer, CaseDetailSerializer, CaseTreeSerializer
 
 
 class ScriptUploadCaseView(APIView):
@@ -37,9 +39,9 @@ class ScriptUploadCaseView(APIView):
             client = case.pop('client')
             module = case.pop('module')
             try:
-                client_obj = Client.objects.get(name=client)
+                client_obj = Module.objects.get(name=client)
                 module_obj = Module.objects.get(name=module, client=client_obj)
-            except Client.DoesNotExist:
+            except Module.DoesNotExist:
                 message.add(f'当前应用[{client}]不存在，请先添加')
                 fail.append(case_id)
             except Module.DoesNotExist:
@@ -70,33 +72,18 @@ class ScriptUploadCaseView(APIView):
                         status=status.HTTP_201_CREATED)
 
 
-class ClientView(APIView):
-    """应用视图"""
-
-    def get(self, request):
-        instance = Client.objects.all()
-        serializer = ClientSerializer(instance=instance, many=True)
-
-        return Response(serializer.data)
-
-    def post(self, request):
-        data = request.data
-
-        serializer = ClientSerializer(data=data, context=request.user)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-
 class ModuleView(APIView):
     """功能模块视图"""
 
     def get(self, request):
-        instance = Module.objects.all()
-        serializer = ClientSerializer(instance=instance, many=True)
+        instance = Module.objects.filter(parent=None)
+        serializer = ModuleSerializer(instance=instance, many=True)
 
-        return Response(serializer.data)
+        # 将[] 改成 null，避免前端界面展示空级联
+        json_data = json.dumps(serializer.data)
+        json_data = json_data.replace('"subs": []', '"subs": null')
+
+        return Response(json.loads(json_data))
 
     def post(self, request):
         data = request.data
@@ -122,15 +109,22 @@ class CaseListView(ListAPIView):
         # 处理掉空值，避免干扰查询
         valid_conditions = dict()
         for key, value in conditions.items():
-            if value != "":
+            if value not in ("", None):
                 valid_conditions[key] = value
 
         # 用例编号和名称提供模糊查询
-        case_id = valid_conditions.pop('case_id', "")
-        case_name = valid_conditions.pop('case_name', "")
+        no = valid_conditions.pop('no', "")
+        name = valid_conditions.pop('name', "")
 
-        instance = Case.objects.filter(**valid_conditions, case_name__contains=case_name, case_id__icontains=case_id,
-                                       status=True).order_by('-create_time')
+        # 创建时间为范围匹配
+        code_time = valid_conditions.pop('code_time', None)
+        if code_time:
+            instance = Case.objects.filter(**valid_conditions, name__contains=name, no__icontains=no,
+                                           code_time__gte=code_time[0], code_time__lte=code_time[1],
+                                           status=True).order_by('-create_time')
+        else:
+            instance = Case.objects.filter(**valid_conditions, name__contains=name, no__icontains=no,
+                                           status=True).order_by('-create_time')
 
         return instance
 
@@ -144,24 +138,51 @@ class CaseView(APIView):
 
     def get(self, request):
         """查询用例"""
-        case_id = request.query_params.get('case_id')
+        id = request.query_params.get('id')
 
-        try:
-            case = Case.objects.get(case_id=case_id)
-        except Case.DoesNotExist:
-            return Response({'msg': '用例不存在'})
+        if id:
+            try:
+                case = Case.objects.get(id=id)
+            except Case.DoesNotExist:
+                return Response({'msg': '用例不存在'})
+            else:
+                serializer = CaseSerializer(instance=case)
+                detail_serializer = CaseDetailSerializer(instance=case.detail)
+                base = serializer.data
+                detail = detail_serializer.data
+                base.update(detail)
+                return Response(base)
         else:
-            serializer = CaseSerializer(instance=case)
-            return Response(serializer.data)
+            no = request.query_params.get('no')
+            try:
+                Case.objects.get(no=no)
+            except Case.DoesNotExist:
+                return Response({'msg': '用例不存在'})
+            else:
+                return Response()
 
     def post(self, request):
         """手动新增用例"""
         data = request.data
 
-        data['owner'] = request.user.nickname
-        data['add_time'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        # 无用例编号时，自动添加
+        if not data.get('no'):
+            data['no'] = 'test_' + '{0:%Y%m%d%H%M%S}'.format(datetime.now()) + str(random.randint(0, 9999)).zfill(4)
 
-        serializer = CaseSerializer(data=data, context=request.user)
+        # 校验模块下用例名称
+        try:
+            Case.objects.get(name=data['name'], module=data['module'])
+        except Case.DoesNotExist:
+            pass
+        else:
+            error = f"模块中已存在同名用例 [{data['name']}]"
+            return Response({'msg': error}, status=status.HTTP_400_BAD_REQUEST)
+
+        data['author'] = request.user.nickname
+        data['creator'] = request.user.id
+        data['code_time'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+
+        serializer = CaseSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
@@ -171,16 +192,41 @@ class CaseView(APIView):
         """修改用例"""
         data = request.data
         id = data.pop('id')
-        case_id = data.get('case_id')
 
         try:
-            case = Case.objects.get(id=id, case_id=case_id)
+            case = Case.objects.get(id=id)
         except Case.DoesNotExist:
             return Response({'msg': '用例不存在'}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            serializer = CaseSerializer(instance=case, data=data, context=request.user)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
+            # 修改用例
+            for key, value in data.items():
+                if hasattr(case, key):
+                    if key == 'module':
+                        try:
+                            module = Module.objects.get(id=value)
+                        except Case.DoesNotExist:
+                            return Response({'msg': '当前勾选的模块不在系统中'}, status=status.HTTP_400_BAD_REQUEST)
+                        else:
+                            setattr(case, key, module)
+                            continue
+                    if key == 'is_auto' and not value:
+                        setattr(case, key, value)
+                        setattr(case.detail, 'path', None)
+                        setattr(case, 'version', None)
+                        setattr(case, 'type', None)
+                        continue
+
+                    setattr(case, key, value)
+                elif hasattr(case.detail, key):
+                    setattr(case.detail, key, value)
+
+            # 更新修改人及修改时间
+            setattr(case, 'reviser', request.user)
+            setattr(case, 'update_time', time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+
+            # 保存修改
+            case.save()
+            case.detail.save()
 
             return Response({'msg': '保存修改成功'})
 
@@ -188,16 +234,15 @@ class CaseView(APIView):
         """删除用例"""
         data = request.data
         id = data.get('id')
-        case_id = data.get('case_id')
 
         try:
-            case = Case.objects.get(id=id, case_id=case_id)
+            case = Case.objects.get(id=id)
         except Case.DoesNotExist:
             return Response({'msg': '用例不存在'}, status=status.HTTP_400_BAD_REQUEST)
         else:
             case.status = False
             case.save()
-            return Response({'msg': '用例删除完成'})
+            return Response({'msg': '用例已删除'})
 
 
 class XmindUploadCaseView(APIView):
@@ -212,9 +257,9 @@ class XmindUploadCaseView(APIView):
 
         # 定义一个用例等级映射字典
         level_mapping = {
-            'priority-1': 'H',
-            'priority-2': 'M',
-            'priority-3': 'L'
+            'priority-1': 1,
+            'priority-2': 2,
+            'priority-3': 3
         }
 
         # 写入数据库
@@ -223,49 +268,87 @@ class XmindUploadCaseView(APIView):
 
         # 用例筛选校验
         for sheet in xmind_dict:
-            app_name = sheet.get('topic').get('title')
-            for module in sheet.get('topic').get('topics'):
-                module_name = module.get('title')
-                # 校验测试应用及模块是否存在
+            # 校验根级模块
+            name = sheet.get('topic').get('title')
+            try:
+                ins_module = Module.objects.get(name=name)
+            except Module.DoesNotExist:
+                error = f'[{content.__str__()}] - [{name}] 不存在'
+                return Response({'error': error})
+
+            for module_1 in sheet.get('topic').get('topics'):
+                # 校验一级模块
+                if module_1.get("makers"):
+                    error = f'[{content.__str__()}]-  [{name}] 下级必须是功能模块'
+                    return Response({'error': error})
+                name_1 = module_1.get('title')
                 try:
-                    client_obj = Client.objects.get(name=app_name)
-                    module_obj = Module.objects.get(name=module_name, client=client_obj)
-                except Client.DoesNotExist as e:
-                    error = f'[{content.__str__()}]-应用[{app_name}]不存在，请先添加'
+                    ins_module_1 = Module.objects.get(name=name_1, parent=ins_module)
+                except Module.DoesNotExist:
+                    error = f'[{content.__str__()}]-[{name}] 下无模块 [{name_1}]，请先添加'
                     return Response({'error': error})
-                except Module.DoesNotExist as e:
-                    error = f'[{content.__str__()}]-应用[{app_name}]无功能模块[{module_name}]，请先添加'
-                    return Response({'error': error})
-                else:
-                    for case in module.get('topics'):
-                        case_name = case.get('title')
-                        for info in case.get('topics'):
-                            case_id = info.get('title')
-                            level = level_mapping.get(info.get("makers")[0], 'M')
-                            step = ''
-                            for sub_step in info.get('topics'):
-                                step += sub_step.get('title') + ' \n '
 
-                            single_case = dict()
-                            single_case['client_id'] = client_obj.id
-                            single_case['module_id'] = module_obj.id
-                            single_case['case_name'] = case_name
-                            single_case['case_id'] = case_id
-                            single_case['level'] = level
-                            single_case['step'] = step
-                            single_case['owner'] = request.user.nickname
-                            # 默认导入当天为用例编写时间
-                            single_case['add_time'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                for module_2 in module_1.get('topics'):
+                    # 校验二级模块
+                    if not module_2.get("makers"):
+                        name_2 = module_2.get('title')
+                        try:
+                            ins_module_2 = Module.objects.get(name=name_2, parent=ins_module_1)
+                        except Module.DoesNotExist:
+                            error = f'[{content.__str__()}]-模块 [{name_1}] 下无模块 [{name_2}] ，请先添加'
+                            return Response({'error': error})
 
-                            serializer = CaseSerializer(data=single_case, context=request.user)
+                        # 用例信息
+                        case_list = module_2.get('topics')
+                    else:
+                        ins_module_2 = None
+                        case_list = [module_2]
 
-                            try:
-                                serializer.is_valid(raise_exception=True)
-                            except ValidationError as e:
-                                error = f'[{content.__str__()}]-[{single_case["case_id"]}]用例编号已存在' if '用例编号' in f'{e}' else f'[{content.__str__()}]-[{single_case["case_id"]}]校验异常:\n >{e}'
-                                return Response({'error': error})
-                            else:
-                                serializer_list.append(serializer)
+                    # 搜集用例信息
+                    for case in case_list:
+                        if not case.get("makers"):
+                            error = f"[{content.__str__()}] - 用例 [{case.get('title')}] 用例等级必填"
+                            return Response({'error': error})
+
+                        # 校验同一模块下是否有同名用例
+                        name = case.get('title')
+                        try:
+                            ins = Case.objects.get(name=name,
+                                                   module=ins_module_2 if ins_module_2 else ins_module_1)
+                        except Case.DoesNotExist:
+                            pass
+                        else:
+                            error = f'[{content.__str__()}] - 模块 [{name_1}] 中已存在用例 [{name}]  状态: {"可用" if ins.status else "不可用"}'
+                            return Response({'error': error})
+
+                        priority = level_mapping.get(case.get("makers")[0], 2)
+
+                        info = case.get('topics')[0]
+                        step = info.get('title')
+                        expectation = info.get('topics')[0].get('title')
+
+                        single_case = dict()
+                        single_case['no'] = 'test_' + '{0:%Y%m%d%H%M%S}'.format(datetime.now()) + str(
+                            random.randint(0, 9999)).zfill(4)
+                        single_case['module'] = ins_module_2.id if ins_module_2 else ins_module_1.id
+                        single_case['name'] = name
+                        single_case['priority'] = priority
+                        single_case['step'] = step
+                        single_case['expectation'] = expectation
+                        single_case['author'] = request.user.nickname
+                        single_case['creator'] = request.user.id
+                        # 默认导入当天为用例编写时间
+                        single_case['code_time'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+
+                        serializer = CaseSerializer(data=single_case)
+
+                        try:
+                            serializer.is_valid(raise_exception=True)
+                        except ValidationError as e:
+                            error = f'[{content.__str__()}] - [{single_case["name"]}] 用例编号已存在' if '用例编号' in f'{e}' else f'[{content.__str__()}] - [{single_case["name"]}] 校验异常:\n >{e}'
+                            return Response({'error': error})
+                        else:
+                            serializer_list.append(serializer)
 
         # 开启事物，写入数据库
         with transaction.atomic():
@@ -273,30 +356,40 @@ class XmindUploadCaseView(APIView):
             try:
                 for serializer in serializer_list:
                     serializer.save()
-                    success.append(f'[{content.__str__()}]-[{serializer.validated_data["case_id"]}]')
+                    success.append(f'[{content.__str__()}]-[{serializer.validated_data["name"]}]')
             except DatabaseError as e:
                 # 有任何异常都回退并返回
                 transaction.savepoint_rollback(save_id)
-
-                error = f'[{content.__str__()}]中用例写入数据库失败:\n >{e}'
+                error = f'[{content.__str__()}] 用例写入数据库失败:\n >{e}'
                 return Response({'error': error})
-            except Exception:
+            except Exception as e:
                 # 有任何异常都回退并返回
                 transaction.savepoint_rollback(save_id)
-
-                return Response({'error': '惊！发生未知异常！！！'})
+                return Response({'error': f'惊！发生未知异常！！！ \n {e}'})
             else:
                 # 无异常就提交事物
                 transaction.savepoint_commit(save_id)
-
                 return Response({'count': len(success), 'success': success}, status=status.HTTP_201_CREATED)
 
 
-class JobCaseListView(APIView):
+class CaseTreeView(APIView):
     """Job任务用例列表"""
 
     def get(self, request):
-        querySet = Client.objects.all()
-        serializer = JobClientSerializer(instance=querySet, many=True)
+        queryset = Module.objects.filter(parent=None)
+        serializer = CaseTreeSerializer(instance=queryset, many=True)
+
+        # 处理响应数据
+        def make_result(items: list):
+            for item in items:
+                if item.get('subs'):
+                    make_result(item.get('subs'))
+                # 给模块价格标识，方便区分
+                for module in item['subs']:
+                    module['name'] = '[M] ' + module['name']
+
+                item['subs'].extend(item.pop('cases'))
+
+        make_result(serializer.data)
 
         return Response(serializer.data)

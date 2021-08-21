@@ -124,7 +124,7 @@ class DispatchJobView(APIView):
         try:
             user = User.objects.get(id=user_id)
         except User.DoesNotExist:
-            return Response({'msg': '指派对象不存在'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'msg': '被指派人不存在'}, status=status.HTTP_400_BAD_REQUEST)
 
         querySet.update(executor=user, status=2)
 

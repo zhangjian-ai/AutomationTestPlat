@@ -49,7 +49,7 @@ class JobToCase(BaseModel):
     test_detail = models.CharField(max_length=2000, null=True, blank=True, verbose_name="测试结果详情")
 
     class Meta:
-        db_table = 'tp_job_to_case'
+        db_table = 'tp_job_case'
         verbose_name = '任务用例关联表'
         verbose_name_plural = verbose_name
 
@@ -58,10 +58,13 @@ class JobToCase(BaseModel):
 @receiver(post_delete, sender=JobToCase)
 def delete_storage(sender, **kwargs):
     storage = FastDFSStorage()
+
+    test_detail = kwargs['instance'].test_detail
     # 匹配出所有file_id
-    ids = re.findall(rf'<img src="{storage.base_url}(.+?)">', kwargs['instance'].test_detail)
-    for id in ids:
-        try:
-            storage.delete(id)
-        except DataError:
-            pass
+    if test_detail:
+        ids = re.findall(rf'<img src="{storage.base_url}(.+?)">', test_detail)
+        for id in ids:
+            try:
+                storage.delete(id)
+            except DataError:
+                pass

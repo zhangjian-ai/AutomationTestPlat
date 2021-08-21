@@ -3,16 +3,20 @@
     <!-- 任务列表 -->
     <el-col :span="7" v-show="showJobs">
       <div class="job_list">
-        <div class="title">
-          <span>{{ type == 0 ? '我的任务(未完成)' : '我的任务(已完成)' }}</span>
-          <el-button
-            size="mini"
-            icon="el-icon-refresh"
-            type="primary"
-            style="margin-left: 8em; padding: 0.5em;"
-            @click="getJobList()"
-          >{{ type == 0 ? '已完成' : '未完成' }}</el-button>
-        </div>
+        <el-row class="title">
+          <el-col :span="20">
+            <span>{{ type == 0 ? '我的任务(未完成)' : '我的任务(已完成)' }}</span>
+          </el-col>
+          <el-col :span="4">
+            <el-button
+              size="mini"
+              icon="el-icon-refresh"
+              type="primary"
+              style="padding: 0.5em;"
+              @click="getJobList()"
+            >{{ type == 0 ? '已完成' : '未完成' }}</el-button>
+          </el-col>
+        </el-row>
         <el-divider></el-divider>
         <el-table
           :data="jobList"
@@ -55,13 +59,12 @@
     <el-col :span="showJobs ? 16 : 24" v-show="currentJob.task_no">
       <!-- 任务详情 -->
       <div class="job_detail">
-        <el-descriptions
-          :title="currentJob.task_name | ellipsis(showJobs)"
-          :column="4"
-          direction="vertical"
-          border
-        >
-          <template slot="extra">
+        <el-row>
+          <el-col
+            :span="16"
+            style="font-size: 1.5em; font-weight: bolder;"
+          >{{ currentJob.task_name | ellipsis(showJobs) }}</el-col>
+          <el-col :span="8" style="text-align: right;">
             <el-button
               v-show="currentJob.status == 3"
               size="mini"
@@ -86,7 +89,10 @@
               type="primary"
               @click="startTest()"
             >{{ showJobs ? '查看详情' : '任务列表' }}</el-button>
-          </template>
+          </el-col>
+        </el-row>
+        <el-descriptions :column="4" direction="vertical" border v-show="showJobs">
+          <!-- <template slot="extra"></template> -->
           <el-descriptions-item label="责任人">{{currentJob.executor_name }}</el-descriptions-item>
           <el-descriptions-item label="任务类型">{{ currentJob.type_str }}</el-descriptions-item>
           <el-descriptions-item label="计划完成时间">{{ currentJob.expect_end_time }}</el-descriptions-item>
@@ -106,7 +112,6 @@
               effect="dark"
             >{{ currentJob.status_str }}</el-tag>
           </el-descriptions-item>
-
           <el-descriptions-item label="关联需求">{{currentJob.prd_no }}</el-descriptions-item>
           <el-descriptions-item label="任务编号">{{currentJob.task_no }}</el-descriptions-item>
           <el-descriptions-item label="任务描述">{{currentJob.task_detail }}</el-descriptions-item>
@@ -127,11 +132,11 @@
               highlight-current-row
               @current-change="handleRowChange"
             >
-              <el-table-column label="序号" type="index" width="50" align="center"></el-table-column>
+              <el-table-column label="序号" type="index" min-width="50%" align="center"></el-table-column>
               <el-table-column
                 align="left"
-                prop="case.case_name"
-                :width="showJobs ? 200 : 210"
+                prop="case.name"
+                :min-width="showJobs ? '200%' : '210%'"
                 show-overflow-tooltip
               ></el-table-column>
               <el-table-column align="center">
@@ -161,9 +166,9 @@
         </el-col>
         <!-- 用例详情 -->
         <el-col :span="16">
-          <div class="case_detail" v-if="!showJobs && currentCase.id">
+          <div class="case_detail" v-if="!showJobs && showCaseDetail">
             <el-descriptions
-              :title="currentCase.case.case_name | ellipsis(showJobs)"
+              :title="currentCase.case.name | ellipsis(showJobs)"
               size="small"
               border
             >
@@ -177,7 +182,7 @@
                   style="width: 7em; margin-right: 2em;"
                 >
                   <el-option
-                    v-for="item in case_statusList"
+                    v-for="item in $store.state.case_status"
                     :key="item[0]"
                     :label="item[1]"
                     :value="item[0]"
@@ -191,28 +196,31 @@
                   @click="submitTestResult()"
                 >确 定</el-button>
               </template>
-              <el-descriptions-item label="用例编号">{{ currentCase.case.case_id }}</el-descriptions-item>
-              <el-descriptions-item label="用例描述">{{ currentCase.case.description }}</el-descriptions-item>
+              <el-descriptions-item label="用例编号">{{ currentCase.case.no }}</el-descriptions-item>
+              <el-descriptions-item
+                label="所属模块"
+              >{{ (currentCase.case.module_str1 ? currentCase.case.module_str1 + " / " : "") + (currentCase.case.module_str2 ? currentCase.case.module_str2 + " / " : "") + (currentCase.case.module_str3 ? currentCase.case.module_str3 : "") }}</el-descriptions-item>
               <el-descriptions-item label="属性标签">
-                <el-tag size="mini" type="primary" effect="dark">{{ currentCase.case.level_value }}</el-tag>
+                <el-tag
+                  size="mini"
+                  :type="caseTag[currentCase.case.priority_str]"
+                  effect="dark"
+                >{{ currentCase.case.priority_str }}</el-tag>
                 <el-tag v-show="currentCase.case.is_auto" size="mini" type="primary" effect="dark">A</el-tag>
               </el-descriptions-item>
-
-              <el-descriptions-item label="系统">{{ "系统名称" }}</el-descriptions-item>
-              <el-descriptions-item label="一级模块">{{ "一级模块" }}</el-descriptions-item>
-              <el-descriptions-item label="二级模块">{{ "二级模块" }}</el-descriptions-item>
-
-              <el-descriptions-item label="预期结果" :span="3">{{ "预期结果" }}</el-descriptions-item>
+              <el-descriptions-item label="AUTHOR" :span="1">{{ currentCase.case.author }}</el-descriptions-item>
+              <el-descriptions-item label="用例描述" :span="2">{{ currentCase.case.description }}</el-descriptions-item>
               <el-descriptions-item label="测试步骤" :span="3">{{ currentCase.case.step }}</el-descriptions-item>
+              <el-descriptions-item label="预期结果" :span="3">{{ currentCase.case.expectation }}</el-descriptions-item>
             </el-descriptions>
           </div>
           <!-- 富文本编辑器 -->
           <editor
-            v-show="!showJobs && currentJob.status != 4 && currentCase.id"
+            v-show="!showJobs && currentJob.status != 4 && showCaseDetail"
             :value.sync="currentCase.test_detail"
             ref="richText"
           ></editor>
-          <div class="results" v-show="currentJob.status == 4 && currentCase.test_detail">
+          <div class="results" v-show="currentJob.status == 4 && showCaseDetail">
             <p class="banner">测 试 记 录</p>
             <div v-html="currentCase.test_detail"></div>
           </div>
@@ -223,16 +231,14 @@
 </template>
 <script>
 /* eslint-disable */
-
 import pagination from "../common/simple_pagination.vue";
 import editor from "../common/editor.vue";
-
 import {
   job_list,
   job_case_detail,
-  get_constants,
   saveTestResult,
-  modify_job
+  modify_job,
+  query_case
 } from "@/api";
 export default {
   data() {
@@ -264,8 +270,12 @@ export default {
         4: "info"
       },
 
-      // 用例状态列表
-      case_statusList: [],
+      // 用例等级标签类型映射
+      caseTag: {
+        高: "danger",
+        中: "success",
+        低: "info"
+      },
 
       // 测试任务切换变量 0:未完成  1:已完成
       type: 0,
@@ -284,7 +294,10 @@ export default {
       caseList: [],
 
       // 是否展示列表
-      showJobs: true
+      showJobs: true,
+
+      // 是否展示用例详情
+      showCaseDetail: false
     };
   },
 
@@ -326,12 +339,18 @@ export default {
         // 赋值之前清空一下可能未使用的图片
         this.$refs.richText.clearAllImage();
         this.currentCase = JSON.parse(JSON.stringify(now));
+
+        // 获取用例详情
+        query_case(this.currentCase.case.id).then(res => {
+          this.currentCase.case = JSON.parse(JSON.stringify(res.data));
+        });
       }
     },
 
     // 开始测试
     startTest() {
       this.showJobs = !this.showJobs;
+      this.showCaseDetail = false;
 
       // 还原页码
       this.case_page = 1;
@@ -354,9 +373,15 @@ export default {
         ).then(res => {
           this.caseList = res.data.results;
           this.case_count = res.data.count;
-          this.loading = false;
 
-          this.currentCase = JSON.parse(JSON.stringify(this.caseList[0]));
+          // 获取用例详情
+          query_case(this.caseList[0].case.id).then(res => {
+            this.currentCase = JSON.parse(JSON.stringify(this.caseList[0]));
+            this.currentCase.case = JSON.parse(JSON.stringify(res.data));
+
+            this.loading = false;
+            this.showCaseDetail = true;
+          });
         });
       } else {
         // 清空可能未使用的图片
@@ -381,47 +406,46 @@ export default {
       return false;
     },
 
-    // 加载搜索栏下拉框、用例等级信息
-    loadOption() {
-      get_constants("JOB").then(res => {
-        this.case_statusList = res.data.CASE_STATUS;
-      });
-    },
-
     // 保存测试结果
     submitTestResult() {
       let that = this;
       // 提交之前先清空无效的图片链接
       this.$refs.richText.clearInvalidImage();
 
-      saveTestResult({
-        // 组装请求数据
-        id: this.currentCase.id,
-        case_status: this.currentCase.case_status,
-        test_detail: this.currentCase.test_detail
-      }).then(res => {
-        this.$message.success(res.data.msg);
+      if (this.currentCase.test_detail) {
+        saveTestResult({
+          // 组装请求数据
+          id: this.currentCase.id,
+          case_status: this.currentCase.case_status,
+          test_detail: this.currentCase.test_detail
+        }).then(res => {
+          this.$message.success(res.data.msg);
 
-        // 再不刷新的情况下临时修改用例状态
-        let data = res.data.data;
-        for (let i in this.caseList) {
-          if (this.caseList[i].id == data.id) {
-            this.caseList[i].case_status = data.case_status;
-            this.caseList[i].case_status_str = data.case_status_str;
-            this.caseList[i].test_detail = data.test_detail;
+          // 再不刷新的情况下临时修改用例状态
+          let data = res.data.data;
+          for (let i in this.caseList) {
+            if (this.caseList[i].id == data.id) {
+              this.caseList[i].case_status = data.case_status;
+              this.caseList[i].case_status_str = data.case_status_str;
+              this.caseList[i].test_detail = data.test_detail;
 
-            // 修改任务状态
-            if (this.currentJob.status == 2) {
-              this.currentJob.status = 3;
-              this.currentJob.status_str = "测试中";
+              // 修改任务状态
+              if (this.currentJob.status == 2) {
+                this.currentJob.status = 3;
+                this.currentJob.status_str = "测试中";
+              }
+
+              // 清空富文本中图片列表
+              that.$refs.richText.clearImageList();
+              return;
             }
-
-            // 清空富文本中图片列表
-            that.$refs.richText.clearImageList();
-            return;
           }
-        }
-      });
+        });
+      } else {
+        this.$message.warning({
+          message: "请记录您的测试结果"
+        });
+      }
     },
 
     // 任务状态变更
@@ -440,6 +464,7 @@ export default {
         this.currentJob.status = res.data.data.status;
         this.currentJob.status_str = res.data.data.status_str;
 
+        this.showCaseDetail = false;
         // 关闭任务时,打开任务列表,同时清空用例列表
         if (state == 4) {
           this.showJobs = true;
@@ -452,7 +477,6 @@ export default {
   created() {
     // 加载测试任务
     this.loadJobList("unfinish");
-    this.loadOption();
   },
   beforeDestroy() {
     // 再清理一次未使用的图片
@@ -485,11 +509,11 @@ export default {
   background-color: tomato;
   padding: 1px 0;
 }
-/deep/ .el-table__body tr.current-row > td {
+div /deep/ .el-table__body tr.current-row > td {
   background-color: #3b7ec5 !important;
   color: whitesmoke;
 }
-/deep/ .el-table--enable-row-hover .el-table__body tr:hover > td {
+div /deep/ .el-table--enable-row-hover .el-table__body tr:hover > td {
   background: #609fe2 !important;
   color: whitesmoke;
 }
@@ -511,6 +535,9 @@ export default {
 .job_detail {
   padding: 0.5em;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
+}
+.job_detail .el-row {
+  margin: 0.5em 0;
 }
 .job_detail /deep/ .el-descriptions__title {
   font-size: 1.5em;
@@ -549,7 +576,7 @@ export default {
 .results {
   padding: 1em;
   margin-top: 1.5em;
-  height: 30em;
+  max-height: 40em;
   overflow: auto;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
 }

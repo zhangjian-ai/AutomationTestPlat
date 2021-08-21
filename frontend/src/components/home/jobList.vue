@@ -24,7 +24,7 @@
               <el-form-item label="任务状态:">
                 <el-select v-model="conditions.status" placeholder="任务状态" clearable>
                   <el-option
-                    v-for="item in statusList"
+                    v-for="item in $store.state.status"
                     :key="item[0]"
                     :label="item[1]"
                     :value="item[0]"
@@ -36,7 +36,7 @@
               <el-form-item label="优先级:">
                 <el-select v-model="conditions.level" placeholder="优先级" clearable>
                   <el-option
-                    v-for="item in levelList"
+                    v-for="item in $store.state.levels"
                     :key="item[0]"
                     :label="item[1]"
                     :value="item[0]"
@@ -50,7 +50,7 @@
               <el-form-item label="任务类型:">
                 <el-select v-model="conditions.type" placeholder="任务类型" clearable>
                   <el-option
-                    v-for="item in typeList"
+                    v-for="item in $store.state.categories"
                     :key="item.id"
                     :label="item[1]"
                     :value="item[0]"
@@ -62,7 +62,7 @@
               <el-form-item label="创建人:">
                 <el-select v-model="conditions.create_user" placeholder="创建人" clearable filterable>
                   <el-option
-                    v-for="item in userList"
+                    v-for="item in $store.state.users"
                     :key="item.id"
                     :label="item.nickname"
                     :value="item.id"
@@ -74,7 +74,7 @@
               <el-form-item label="责任人:">
                 <el-select v-model="conditions.executor" placeholder="责任人" clearable filterable>
                   <el-option
-                    v-for="item in userList"
+                    v-for="item in $store.state.users"
                     :key="item.id"
                     :label="item.nickname"
                     :value="item.id"
@@ -103,19 +103,8 @@
             >批量指派</el-button>
           </el-col>
           <el-col :span="22">
-            <el-button
-              type="primary"
-              icon="el-icon-search"
-              size="mini"
-              @click="getJobsByQuery()"
-              native-type="submit"
-            >查询</el-button>
-            <el-button
-              type="info"
-              icon="el-icon-refresh-left"
-              size="mini"
-              @click="conditions = {}"
-            >重置</el-button>
+            <el-button type="primary" icon="el-icon-search" size="mini" @click="getJobsByQuery()">查询</el-button>
+            <el-button icon="el-icon-refresh-left" size="mini" @click="conditions = {}">重置</el-button>
           </el-col>
         </el-row>
       </div>
@@ -123,39 +112,30 @@
     <!-- 信息展示区 -->
     <el-table
       :data="jobList"
-      stripe
       v-loading="loading"
-      border
-      height="48em"
       size="mini"
+      border
       @selection-change="handleSelectionChange"
       :header-cell-style="{background:'#eef1f6',color:'#606266', 'text-align': 'center'}"
     >
       <el-table-column type="selection" align="center"></el-table-column>
-      <el-table-column label="序号" type="index" width="50" align="center"></el-table-column>
-      <el-table-column prop="task_no" label="任务编号" width="150"></el-table-column>
-      <el-table-column
-        prop="task_name"
-        label="任务名称"
-        width="220"
-        align="center"
-        show-overflow-tooltip
-      ></el-table-column>
-      <el-table-column prop="status_str" label="状态" width="100" align="center"></el-table-column>
-      <el-table-column prop="level_str" label="优先级" width="120" align="center"></el-table-column>
-      <el-table-column prop="type_str" label="任务类型" width="100" align="center"></el-table-column>
-      <el-table-column prop="executor_name" label="责任人" width="80" align="center"></el-table-column>
-      <el-table-column prop="expect_end_time" label="计划完成时间" width="150" align="center"></el-table-column>
-      <el-table-column prop="actual_end_time" label="实际完成时间" width="150" align="center"></el-table-column>
-      <el-table-column prop="create_time" label="创建时间" width="150" align="center"></el-table-column>
-      <el-table-column label="延期" width="60" align="center">
+      <el-table-column label="序号" type="index" min-width="50%" align="center"></el-table-column>
+      <el-table-column prop="task_no" label="任务编号" min-width="150%"></el-table-column>
+      <el-table-column prop="task_name" label="任务名称" min-width="200%" align="center"></el-table-column>
+      <el-table-column prop="status_str" label="状态" min-width="100%" align="center"></el-table-column>
+      <el-table-column prop="level_str" label="优先级" min-width="120%" align="center"></el-table-column>
+      <el-table-column prop="type_str" label="任务类型" min-width="100%" align="center"></el-table-column>
+      <el-table-column prop="executor_name" label="责任人" min-width="80%" align="center"></el-table-column>
+      <el-table-column prop="expect_end_time" label="计划完成时间" min-width="150%" align="center"></el-table-column>
+      <el-table-column prop="actual_end_time" label="实际完成时间" min-width="150%" align="center"></el-table-column>
+      <el-table-column prop="create_time" label="创建时间" min-width="150%" align="center"></el-table-column>
+      <el-table-column label="延期" min-width="60%" align="center">
         <template slot-scope="scope">{{ scope.row.is_delay ? '是' : '否' }}</template>
       </el-table-column>
-      <el-table-column prop="create_user_name" label="创建人" width="80" align="center"></el-table-column>
-      <el-table-column prop="prd_no" label="关联需求号" width="120" align="center"></el-table-column>
-      <el-table-column label="操作" align="center" width="100">
+      <el-table-column prop="create_user_name" label="创建人" min-width="80%" align="center"></el-table-column>
+      <el-table-column prop="prd_no" label="关联需求号" min-width="120%" align="center"></el-table-column>
+      <el-table-column label="操作" align="center" min-width="100%">
         <template slot-scope="scope">
-          <el-link :underline="false">查看</el-link>
           <el-link
             v-if="scope.row.executor_name == null"
             :underline="false"
@@ -185,7 +165,7 @@
         <el-form-item label="指派给:" prop="user_id">
           <el-select v-model="dispatchForm.user_id" filterable>
             <el-option
-              v-for="item in userList"
+              v-for="item in $store.state.users"
               :key="item.id"
               :label="item.nickname"
               :value="item.id"
@@ -202,7 +182,7 @@
 </template>
 <script>
 import pagination from "../common/pagination.vue";
-import { get_constants, user_list, job_list, dispatch_job } from "@/api";
+import { job_list, dispatch_job } from "@/api";
 export default {
   data() {
     return {
@@ -211,12 +191,6 @@ export default {
 
       // 查询条件
       conditions: {},
-
-      // 下拉框变量
-      statusList: [],
-      levelList: [],
-      typeList: [],
-      userList: [],
 
       //  加载中
       loading: false,
@@ -267,24 +241,12 @@ export default {
       this.getJobs();
     },
 
-    // 加载搜索栏下拉框、用例等级信息
-    loadOption() {
-      get_constants("JOB").then(res => {
-        this.levelList = res.data.LEVEL;
-        this.typeList = res.data.TYPE;
-        this.statusList = res.data.STATUS;
-      });
-      user_list().then(res => {
-        this.userList = res.data;
-      });
-    },
-
     // 批量勾选行
     handleSelectionChange(rows) {
       this.selectedRows = rows;
     },
 
-    // 打开弹框
+    // 打开指派任务弹框
     openDialog(rows) {
       // 清空ids
       this.job_ids = [];
@@ -337,7 +299,6 @@ export default {
   },
   created() {
     this.getJobs();
-    this.loadOption();
   },
   components: {
     pagination
@@ -355,13 +316,14 @@ export default {
   text-align: right;
 }
 .condition /deep/ .el-form-item__label {
-  font-size: 0.9em !important;
+  font-size: 0.8em !important;
+  font-weight: 350;
 }
 .condition .el-input {
-  width: 14em;
+  width: 15em;
 }
 .condition .el-select {
-  width: 12em;
+  width: 12.8em;
 }
 .el-table .el-link {
   font-size: 0.6em;

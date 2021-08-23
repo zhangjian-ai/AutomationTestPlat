@@ -335,15 +335,21 @@ export default {
 
     // 用例当前行变化的事件
     handleRowChange(now, old) {
-      if (this.currentCase.id != now.id) {
-        // 赋值之前清空一下可能未使用的图片
-        this.$refs.richText.clearAllImage();
-        this.currentCase = JSON.parse(JSON.stringify(now));
+      // 赋值之前清空一下可能未使用的图片
+      this.$refs.richText.clearAllImage();
+
+      if (!now.case.no) {
+        this.showCaseDetail = false;
 
         // 获取用例详情
-        query_case(this.currentCase.case.id).then(res => {
-          this.currentCase.case = JSON.parse(JSON.stringify(res.data));
+        query_case(now.case.id).then(res => {
+          now.case = JSON.parse(JSON.stringify(res.data));
+          this.currentCase = JSON.parse(JSON.stringify(now));
+
+          this.showCaseDetail = true;
         });
+      } else {
+        this.currentCase = JSON.parse(JSON.stringify(now));
       }
     },
 
@@ -376,8 +382,8 @@ export default {
 
           // 获取用例详情
           query_case(this.caseList[0].case.id).then(res => {
+            this.caseList[0].case = JSON.parse(JSON.stringify(res.data));
             this.currentCase = JSON.parse(JSON.stringify(this.caseList[0]));
-            this.currentCase.case = JSON.parse(JSON.stringify(res.data));
 
             this.loading = false;
             this.showCaseDetail = true;

@@ -384,7 +384,7 @@ class CaseTreeView(APIView):
             for item in items:
                 if item.get('subs'):
                     make_result(item.get('subs'))
-                # 给模块价格标识，方便区分
+                # 给模块加个标识，方便区分
                 for module in item['subs']:
                     module['name'] = '[M] ' + module['name']
 

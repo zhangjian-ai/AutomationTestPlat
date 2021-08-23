@@ -49,7 +49,7 @@
           <el-divider direction="vertical"></el-divider>
           <el-link :underline="false" @click="$router.push('/workPlat')">工作台</el-link>
           <el-divider direction="vertical"></el-divider>
-          <el-link icon="el-icon-turn-off" :underline="false" @click="logout()">注销</el-link>
+          <el-link :underline="false" @click="logout()">注销</el-link>
         </el-col>
       </div>
       <el-divider></el-divider>
@@ -148,10 +148,14 @@ export default {
   padding: 0.5em 0;
 }
 .header .el-link {
-  color: rgb(99, 99, 99);
-  margin: 0 1em;
-  font-weight: 400;
+  margin: 0 0.6em;
+  padding: 0 0.4em;
 }
+.header .el-link:hover {
+  background: #dcdcdc;
+  border-radius: 3px;
+}
+
 .el-divider {
   margin: 0.5em 0;
   background-color: gray;

@@ -136,8 +136,9 @@
       <el-table-column prop="prd_no" label="关联需求号" min-width="120%" align="center"></el-table-column>
       <el-table-column label="操作" align="center" min-width="100%">
         <template slot-scope="scope">
+          <el-link v-show="scope.row.status < 3" :underline="false">用例</el-link>
           <el-link
-            v-if="scope.row.executor_name == null"
+            v-show="scope.row.executor_name == null"
             :underline="false"
             @click="openDialog([scope.row])"
           >指派</el-link>

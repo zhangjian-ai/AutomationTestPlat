@@ -21,6 +21,8 @@ class UserRegisterView(CreateAPIView):
     用户注册
     直接继承CreateAPIView，父类已经提供了post方法
     """
+    permission_classes = []
+
     # 指定序列化器
     serializer_class = UserRegisterSerializer
 
@@ -29,6 +31,7 @@ class CheckUserCount(APIView):
     """
     检查用户是否存在
     """
+    permission_classes = []
 
     def get(self, request):
         # 获取前端传参
@@ -44,8 +47,6 @@ class CheckUserCount(APIView):
 class UserListView(ListAPIView):
     """用户列表视图"""
 
-    permission_classes = [IsAuthenticated]
-
     serializer_class = UserRegisterSerializer
 
     def get_queryset(self):
@@ -60,6 +61,8 @@ class UserListView(ListAPIView):
 
 class UserLoginView(APIView):
     """登陆视图"""
+
+    permission_classes = []
 
     def post(self, request):
         # 获取前端数据
@@ -109,7 +112,6 @@ class UserLoginView(APIView):
 
 class GetConstantsAttrsView(APIView):
     """获取常量配置"""
-    permission_classes = [IsAuthenticated]
 
     def get(self, request, name):
         # 获取相关属性

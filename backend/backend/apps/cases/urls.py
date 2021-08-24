@@ -7,5 +7,5 @@ urlpatterns = [
     path('caseList/', views.CaseListView.as_view()),
     path('case/', views.CaseView.as_view()),
     path('uploadXmindCase/', views.XmindUploadCaseView.as_view()),
-    path('jobCaseList/', views.CaseTreeView.as_view()),
+    path('caseTree/', views.CaseTreeView.as_view()),
 ]

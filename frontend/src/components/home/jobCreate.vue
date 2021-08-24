@@ -105,7 +105,7 @@
   </div>
 </template>
 <script>
-import { job_case_list, create_job } from "@/api";
+import { case_tree, create_job } from "@/api";
 export default {
   data() {
     return {
@@ -167,7 +167,7 @@ export default {
 
     // 获取用例列表树数据
     getCaseList() {
-      job_case_list().then(res => {
+      case_tree().then(res => {
         this.treeData = res.data;
       });
     },
@@ -278,6 +278,9 @@ export default {
 .caselist /deep/ input.el-input__inner {
   border-radius: 0;
   border: 2px solid black;
+}
+.caselist /deep/ .el-checkbox__input.is-disabled .el-checkbox__inner {
+  background-color: #AAAAAA;
 }
 
 /* 表单部分样式 */

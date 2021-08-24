@@ -16,62 +16,6 @@ from .models import Module, Case
 from .serializer import CaseSerializer, ModuleSerializer, CaseDetailSerializer, CaseTreeSerializer
 
 
-class ScriptUploadCaseView(APIView):
-    """
-    脚本上传用例视图
-    """
-
-    def post(self, request):
-        # 获取数据
-        data = request.data.get('data')
-        # 校验列表是否为空
-        if not data or not isinstance(data, list):
-            return Response({'msg': '参数为空或格式错误，期望格式是list'}, status=status.HTTP_400_BAD_REQUEST)
-        # 统计变量
-        total = len(data)
-        success = list()
-        fail = list()
-        message = set()
-
-        for case in data:
-            # 检查用例所属端、功能模块、owner
-            case_id = case.get('case_id')
-            client = case.pop('client')
-            module = case.pop('module')
-            try:
-                client_obj = Module.objects.get(name=client)
-                module_obj = Module.objects.get(name=module, client=client_obj)
-            except Module.DoesNotExist:
-                message.add(f'当前应用[{client}]不存在，请先添加')
-                fail.append(case_id)
-            except Module.DoesNotExist:
-                message.add(f'当前应用[{client}]无功能模块[{module}]，请先添加')
-                fail.append(case_id)
-            else:
-                # 校验通过，则为导入数据添加外键对象
-                case['client_id'] = client_obj.id
-                case['module_id'] = module_obj.id
-
-                serializer = CaseSerializer(data=case, context=request.user)
-
-                try:
-                    serializer.is_valid(raise_exception=True)
-                except Exception as e:
-                    message.add(f'[{case["case_id"]}]用例校验失败:\n>{e}')
-                    fail.append(case_id)
-                else:
-                    try:
-                        serializer.save()
-                    except Exception as e:
-                        message.add(f'[{case["case_id"]}]写入数据库失败:\n>{e}')
-                        fail.append(case_id)
-                    else:
-                        success.append(case_id)
-
-        return Response({'success': success, 'fail': fail, 'total': total, 'msg': message},
-                        status=status.HTTP_201_CREATED)
-
-
 class ModuleView(APIView):
     """功能模块视图"""
 
@@ -245,6 +189,36 @@ class CaseView(APIView):
             return Response({'msg': '用例已删除'})
 
 
+class CaseTreeView(APIView):
+    """Job任务用例列表"""
+
+    def get(self, request):
+        queryset = Module.objects.filter(parent=None)
+        serializer = CaseTreeSerializer(instance=queryset, many=True)
+
+        # 处理响应数据
+        def make_result(items: list):
+            for item in items:
+                if item.get('subs'):
+                    make_result(item.get('subs'))
+
+                # 当模块下面无用例时，则不可选中
+                if not item.get('cases'):
+                    item['disabled'] = True
+
+                for module in item['subs']:
+                    if not module.get('disabled', False):
+                        item['disabled'] = False
+                        break
+
+                # 将用例加到subs列表，方便前端解析
+                item['subs'].extend(item.pop('cases'))
+
+        make_result(serializer.data)
+
+        return Response(serializer.data)
+
+
 class XmindUploadCaseView(APIView):
     """xmind用例导入视图"""
 
@@ -372,24 +346,57 @@ class XmindUploadCaseView(APIView):
                 return Response({'count': len(success), 'success': success}, status=status.HTTP_201_CREATED)
 
 
-class CaseTreeView(APIView):
-    """Job任务用例列表"""
+class ScriptUploadCaseView(APIView):
+    """
+    脚本上传用例视图
+    """
 
-    def get(self, request):
-        queryset = Module.objects.filter(parent=None)
-        serializer = CaseTreeSerializer(instance=queryset, many=True)
+    def post(self, request):
+        # 获取数据
+        data = request.data.get('data')
+        # 校验列表是否为空
+        if not data or not isinstance(data, list):
+            return Response({'msg': '参数为空或格式错误，期望格式是list'}, status=status.HTTP_400_BAD_REQUEST)
+        # 统计变量
+        total = len(data)
+        success = list()
+        fail = list()
+        message = set()
 
-        # 处理响应数据
-        def make_result(items: list):
-            for item in items:
-                if item.get('subs'):
-                    make_result(item.get('subs'))
-                # 给模块加个标识，方便区分
-                for module in item['subs']:
-                    module['name'] = '[M] ' + module['name']
+        for case in data:
+            # 检查用例所属端、功能模块、owner
+            case_id = case.get('case_id')
+            client = case.pop('client')
+            module = case.pop('module')
+            try:
+                client_obj = Module.objects.get(name=client)
+                module_obj = Module.objects.get(name=module, client=client_obj)
+            except Module.DoesNotExist:
+                message.add(f'当前应用[{client}]不存在，请先添加')
+                fail.append(case_id)
+            except Module.DoesNotExist:
+                message.add(f'当前应用[{client}]无功能模块[{module}]，请先添加')
+                fail.append(case_id)
+            else:
+                # 校验通过，则为导入数据添加外键对象
+                case['client_id'] = client_obj.id
+                case['module_id'] = module_obj.id
 
-                item['subs'].extend(item.pop('cases'))
+                serializer = CaseSerializer(data=case, context=request.user)
 
-        make_result(serializer.data)
+                try:
+                    serializer.is_valid(raise_exception=True)
+                except Exception as e:
+                    message.add(f'[{case["case_id"]}]用例校验失败:\n>{e}')
+                    fail.append(case_id)
+                else:
+                    try:
+                        serializer.save()
+                    except Exception as e:
+                        message.add(f'[{case["case_id"]}]写入数据库失败:\n>{e}')
+                        fail.append(case_id)
+                    else:
+                        success.append(case_id)
 
-        return Response(serializer.data)
+        return Response({'success': success, 'fail': fail, 'total': total, 'msg': message},
+                        status=status.HTTP_201_CREATED)

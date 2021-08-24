@@ -76,7 +76,7 @@
         </el-form>
         <!-- 查询操作 -->
         <el-row>
-          <el-col :span="24">
+          <el-col :span="23" style="text-align: right;">
             <el-button
               type="primary"
               icon="el-icon-search"
@@ -133,7 +133,7 @@
       <pagination :count="count" :page.sync="page" :page_size.sync="page_size" @function="getCases"></pagination>
     </el-row>
     <!-- 用例详情抽屉 -->
-    <el-drawer :visible.sync="showDrawer" size="45%" :wrapperClosable="false" direction="rtl">
+    <el-drawer :visible.sync="showDrawer" size="40%" :wrapperClosable="false" direction="rtl">
       <div slot="title" style="font-size: 1.2em; color: black;">用例详情</div>
       <div class="form">
         <el-form :model="caseForm" size="mini" label-width="10em" ref="caseForm" :rules="rules">
@@ -405,24 +405,26 @@ export default {
   margin-top: 0.5em;
 }
 .condition {
-  width: 96%;
-  text-align: right;
+  width: 98%;
+  margin-left: 2%;
+  text-align: left;
 }
 .condition /deep/ .el-form-item__label {
   font-size: 0.8em !important;
   font-weight: 350;
+  width: 25%;
 }
-.condition .el-input {
-  width: 15em;
+.condition .el-form-item {
+  width: 100%;
 }
-.condition .el-select {
-  width: 12.8em;
-}
+.condition .el-input,
+.condition .el-select,
 .condition .el-cascader {
-  width: 15em;
+  width: 120%;
 }
+
 .el-date-editor--datetimerange.el-input__inner {
-  width: 12.9em;
+  width: 14.8em;
 }
 
 .el-table {

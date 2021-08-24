@@ -94,7 +94,7 @@
         </el-form>
         <!-- 全局操作 -->
         <el-row>
-          <el-col :span="2" style="text-align: left; padding-left: 1.5em;">
+          <el-col :span="2" style="text-align: left;">
             <el-button
               type="primary"
               icon="el-icon-document"
@@ -102,7 +102,7 @@
               @click="openDialog(selectedRows)"
             >批量指派</el-button>
           </el-col>
-          <el-col :span="22">
+          <el-col :span="21" style="text-align: right;">
             <el-button type="primary" icon="el-icon-search" size="mini" @click="getJobsByQuery()">查询</el-button>
             <el-button icon="el-icon-refresh-left" size="mini" @click="conditions = {}">重置</el-button>
           </el-col>
@@ -136,10 +136,11 @@
       <el-table-column prop="prd_no" label="关联需求号" min-width="120%" align="center"></el-table-column>
       <el-table-column label="操作" align="center" min-width="100%">
         <template slot-scope="scope">
-          <el-link v-show="scope.row.status < 3" :underline="false">用例</el-link>
+          <el-link type="primary" v-show="scope.row.status < 3" :underline="false">用例</el-link>
           <el-link
             v-show="scope.row.executor_name == null"
             :underline="false"
+            type="primary"
             @click="openDialog([scope.row])"
           >指派</el-link>
         </template>
@@ -313,18 +314,25 @@ export default {
   margin: 0.5em 0;
 }
 .condition {
-  width: 96%;
-  text-align: right;
+  width: 98%;
+  margin-left: 2%;
+  text-align: left;
 }
 .condition /deep/ .el-form-item__label {
   font-size: 0.8em !important;
   font-weight: 350;
+  width: 25% !important;
+  margin-left: 0;
 }
-.condition .el-input {
-  width: 15em;
+.condition .el-form-item {
+  width: 100%;
 }
+.condition .el-input,
 .condition .el-select {
-  width: 12.8em;
+  width: 120%;
+}
+.el-dialog .el-select {
+  width: 80%;
 }
 .el-table .el-link {
   font-size: 0.6em;

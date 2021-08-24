@@ -1,7 +1,7 @@
 <template>
   <div class="main">
     <!-- 创建任务表单 -->
-    <el-col :span="11">
+    <el-col :span="10">
       <div class="title">
         <p>创建测试任务</p>
         <el-divider></el-divider>
@@ -72,32 +72,34 @@
       <pre style="margin:0; padding: 0;">&nbsp;</pre>
     </el-col>
     <!-- 用例列表 -->
-    <el-col :span="7" class="caselist">
-      <el-input placeholder="关键字过滤" v-model="filterText" size="mini"></el-input>
-      <el-tree
-        :data="treeData"
-        show-checkbox
-        node-key="id"
-        :render-after-expand="false"
-        @check-change="handleChange"
-        :props="defaultProps"
-        :filter-node-method="filterNode"
-        ref="tree"
-      ></el-tree>
-      <div>
-        <p>
-          <span>
-            ☑️ 您已勾选&nbsp;
-            <span style="color: red;">{{ num }}</span>&nbsp;条用例
-          </span>
-          <el-button
-            style="margin-left: 5em;"
-            size="mini"
-            type="primary"
-            plain
-            @click="clearCaseList()"
-          >清除选中</el-button>
-        </p>
+    <el-col :span="7">
+      <div class="caselist">
+        <el-input placeholder="关键字过滤" v-model="filterText" size="mini"></el-input>
+        <el-tree
+          :data="treeData"
+          show-checkbox
+          node-key="id"
+          :render-after-expand="false"
+          @check-change="handleChange"
+          :props="defaultProps"
+          :filter-node-method="filterNode"
+          ref="tree"
+        ></el-tree>
+        <div>
+          <p>
+            <span>
+              ☑️ 您已勾选&nbsp;
+              <span style="color: red;">{{ num }}</span>&nbsp;条用例
+            </span>
+            <el-button
+              style="margin-left: 5em;"
+              size="mini"
+              type="primary"
+              plain
+              @click="clearCaseList()"
+            >清除选中</el-button>
+          </p>
+        </div>
       </div>
     </el-col>
   </div>
@@ -210,8 +212,7 @@ export default {
           }
         }
       });
-    },
-
+    }
   },
   watch: {
     // 过滤节点
@@ -257,6 +258,7 @@ export default {
 .caselist {
   background-color: rgb(214, 212, 212);
   height: 39em;
+  width: 22em;
   margin-top: 3.5em;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
 }

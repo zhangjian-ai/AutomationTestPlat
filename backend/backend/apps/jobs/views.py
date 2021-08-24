@@ -53,7 +53,7 @@ class JobView(APIView):
             if state == 4:
                 relation = JobToCase.objects.filter(job=job, case_status__in=[0, 2, 3])
                 if len(relation) != 0:
-                    return Response({'msg': '测试尚未完成，不可关闭'}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({'msg': '任务尚未完成'}, status=status.HTTP_400_BAD_REQUEST)
 
                 # 判断是否延期
                 if job.expect_end_time < datetime.now():
@@ -70,7 +70,7 @@ class JobView(APIView):
         except ValidationError as e:
             return Response({'msg': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({'data': serializer.data, 'msg': '任务已关闭' if status == 4 else '任务已修改'})
+        return Response({'data': serializer.data, 'msg': '任务已关闭' if status == 4 else '状态已变更'})
 
 
 class JobListView(ListAPIView):

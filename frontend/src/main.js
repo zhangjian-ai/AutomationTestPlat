@@ -26,7 +26,8 @@ axios.defaults.withCredentials = true
 // http request 拦截器
 axios.interceptors.request.use(
   config => {
-      if (store.state.token) {  // 判断是否存在token，如果存在的话，则每个http header都加上token。本项目使用JWT
+      if (store.state.token) {  
+          // 判断是否存在token，如果存在的话，则每个http header都加上token。本项目使用JWT
           config.headers.Authorization = `JWT ${store.state.token}`;
       }
       return config;
@@ -115,8 +116,6 @@ axios.interceptors.response.use(
   });
 
 Vue.prototype.$axios = axios;    //全局注册，使用方法为:this.$axios
-// Vue.prototype.$api = api;    //全局注册，使用方法为:this.$api  api封装统一管理
-
 
 //  路由权限判断
 router.beforeEach((to, from, next) => {

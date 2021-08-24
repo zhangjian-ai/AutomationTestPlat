@@ -11,7 +11,7 @@ export default {
   // 但是部分组件里面的按钮由于没有冒泡，所以仍无法解决
   methods: {
     clickHandler(ev) {
-      if ((ev.target.nodeName == "SPAN") | (ev.target.nodeName == "I")) {
+      if (ev.target.nodeName == "SPAN" || ev.target.nodeName == "I") {
         ev.target.parentNode.blur();
       }
       if (ev.target.nodeName == "BUTTON") {
@@ -40,6 +40,24 @@ html,
 }
 .el-message .el-message__content {
   font-size: 1em;
+}
+.el-message--error,
+.el-message--error .el-message__content,
+.el-message .el-icon-error {
+  color: red !important;
+  border-color: red !important;
+}
+.el-message--success,
+.el-message--success .el-message__content,
+.el-message .el-icon-success {
+  color: #00aa00 !important;
+  border-color: #00aa00 !important;
+}
+.el-message--warning,
+.el-message--warning .el-message__content,
+.el-message .el-icon-warning {
+  color: #EE7700 !important;
+  border-color: #EE7700 !important;
 }
 
 /* 全局修改级联选择器样式 */

@@ -25,9 +25,9 @@
           v-loading="loading"
           @row-click="handleJobRowClick"
         >
-          <el-table-column align="left" prop="task_name" width="230" show-overflow-tooltip></el-table-column>
+          <el-table-column align="left" prop="task_name" min-width="130%" show-overflow-tooltip></el-table-column>
           <el-table-column align="center">
-            <template slot-scope="scope">
+            <template slot-scope="scope" min-width="80%">
               <el-tag
                 size="mini"
                 :type="levelTag[scope.row.level]"
@@ -449,7 +449,7 @@ export default {
         });
       } else {
         this.$message.warning({
-          message: "请记录您的测试结果"
+          message: "测试结果不能为空"
         });
       }
     },

@@ -2,69 +2,71 @@
   <div class="main">
     <!-- 创建任务表单 -->
     <el-col :span="10">
-      <div class="title">
-        <p>创建测试任务</p>
-        <el-divider></el-divider>
-      </div>
-      <div class="form">
-        <span class="tips">&nbsp;创建任务提交之前请先勾选任务所需之用例</span>
-        <el-form :model="jobForm" label-width="25%" ref="jobForm" :rules="rules" size="mini">
-          <el-form-item label="任务名称:" prop="task_name">
-            <el-input v-model="jobForm.task_name"></el-input>
-          </el-form-item>
-          <el-form-item label="任务详情:">
-            <el-input
-              type="textarea"
-              :autosize="{ minRows: 3, maxRows: 5 }"
-              v-model="jobForm.task_detail"
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="优先级:" prop="level">
-            <el-select v-model="jobForm.level">
-              <el-option
-                v-for="item in $store.state.levels"
-                :key="item[0]"
-                :label="item[1]"
-                :value="item[0]"
-              ></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="任务类型:" prop="type">
-            <el-select v-model="jobForm.type">
-              <el-option
-                v-for="item in $store.state.categories"
-                :key="item[0]"
-                :label="item[1]"
-                :value="item[0]"
-              ></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="责任人:">
-            <el-select v-model="jobForm.executor" filterable clearable>
-              <el-option
-                v-for="item in $store.state.users"
-                :key="item.id"
-                :label="item.nickname"
-                :value="item.id"
-              ></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="关联需求:">
-            <el-input v-model="jobForm.prd_no"></el-input>
-          </el-form-item>
-          <el-form-item label="计划完成时间:" prop="expect_end_time">
-            <el-date-picker
-              v-model="jobForm.expect_end_time"
-              type="datetime"
-              placeholder="选择日期时间"
-              value-format="yyyy-MM-dd HH:mm:ss"
-              width="50%"
-            ></el-date-picker>
-          </el-form-item>
-        </el-form>
-        <div class="footer">
-          <el-button size="mini" @click="jobForm = {}">重 置</el-button>
-          <el-button size="mini" type="primary" @click="create_submit()">保 存</el-button>
+      <div class="text_zone">
+        <div class="title">
+          <p>创建测试任务</p>
+          <el-divider></el-divider>
+        </div>
+        <div class="form">
+          <span class="tips">&nbsp;创建任务提交之前请先勾选任务所需之用例</span>
+          <el-form :model="jobForm" label-width="25%" ref="jobForm" :rules="rules" size="mini">
+            <el-form-item label="任务名称:" prop="task_name">
+              <el-input v-model="jobForm.task_name"></el-input>
+            </el-form-item>
+            <el-form-item label="任务详情:">
+              <el-input
+                type="textarea"
+                :autosize="{ minRows: 3, maxRows: 5 }"
+                v-model="jobForm.task_detail"
+              ></el-input>
+            </el-form-item>
+            <el-form-item label="优先级:" prop="level">
+              <el-select v-model="jobForm.level">
+                <el-option
+                  v-for="item in $store.state.levels"
+                  :key="item[0]"
+                  :label="item[1]"
+                  :value="item[0]"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="任务类型:" prop="type">
+              <el-select v-model="jobForm.type">
+                <el-option
+                  v-for="item in $store.state.categories"
+                  :key="item[0]"
+                  :label="item[1]"
+                  :value="item[0]"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="责任人:">
+              <el-select v-model="jobForm.executor" filterable clearable>
+                <el-option
+                  v-for="item in $store.state.users"
+                  :key="item.id"
+                  :label="item.nickname"
+                  :value="item.id"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="关联需求:">
+              <el-input v-model="jobForm.prd_no"></el-input>
+            </el-form-item>
+            <el-form-item label="计划完成时间:" prop="expect_end_time">
+              <el-date-picker
+                v-model="jobForm.expect_end_time"
+                type="datetime"
+                placeholder="选择日期时间"
+                value-format="yyyy-MM-dd HH:mm:ss"
+                width="50%"
+              ></el-date-picker>
+            </el-form-item>
+          </el-form>
+          <div class="footer">
+            <el-button size="mini" @click="jobForm = {}">重 置</el-button>
+            <el-button size="mini" type="primary" @click="create_submit()">保 存</el-button>
+          </div>
         </div>
       </div>
     </el-col>
@@ -247,7 +249,7 @@ export default {
 </script>
 <style scoped>
 .main {
-  margin: 1em;
+  margin: 2em 3em;
 }
 .caselist p {
   text-align: left;
@@ -280,10 +282,13 @@ export default {
   border: 2px solid black;
 }
 .caselist /deep/ .el-checkbox__input.is-disabled .el-checkbox__inner {
-  background-color: #AAAAAA;
+  background-color: #aaaaaa;
 }
 
 /* 表单部分样式 */
+.text_zone {
+  width: 30em;
+}
 .title {
   width: 100%;
   text-align: left;

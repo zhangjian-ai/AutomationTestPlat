@@ -1,9 +1,7 @@
 <template>
-  <div class="main">
-    <!-- 背景图 -->
-    <el-image :src="url" style="width: 100%; height: 100%;"></el-image>
+  <div class="main" :style="{backgroundImage: 'url('+url+')',backgroundSize: '100% 100%'}">
     <!-- 内容盒子 -->
-    <div class="box">
+    <el-row class="box">
       <div class="sub_box">
         <p class="title">{{title[titleIndex]}}</p>
         <el-divider></el-divider>
@@ -35,7 +33,7 @@
           </el-col>
         </div>
       </div>
-    </div>
+    </el-row>
   </div>
 </template>
 <script>
@@ -109,8 +107,11 @@ export default {
 </script>
 <style scoped>
 .main {
+  margin: 0px;
+  padding: 0px;
   width: 100%;
   height: 100%;
+  text-align: center;
 }
 .title {
   font-size: 1.5em;
@@ -123,11 +124,13 @@ export default {
 
 .box {
   position: absolute;
-  left: 36%;
-  top: 15%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   border-radius: 5px;
   background-color: rgba(245, 245, 245, 0.5);
   width: 24em;
+  text-align: center;
 }
 .sub_box {
   width: 22em;

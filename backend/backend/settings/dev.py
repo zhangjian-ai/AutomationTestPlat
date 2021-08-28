@@ -111,7 +111,9 @@ CACHES = {
         "LOCATION": "redis://121.4.47.229:6379/7",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        }
+            "PASSWORD": "meiduo123",
+            "DECODE_RESPONSES": True
+        },
     },
 }
 
@@ -259,7 +261,10 @@ DEFAULT_FILE_STORAGE = 'backend.utils.fastdfs.FastDFSStorage.FastDFSStorage'
 
 # 定时任务
 CRONJOBS = [
-    # 每5分钟执行一次该定时任务
+    # 每1分钟执行一次该定时任务
+    # 命令：
+    # - python3 manage.py crontab add
+    # - python3 manage.py crontab remove/show
     ('*/1 * * * *', 'jobs.crons.turn_test_job_status',
      f'>> {os.path.join(os.path.dirname(BASE_DIR), "logs", "access.log")}')
 ]

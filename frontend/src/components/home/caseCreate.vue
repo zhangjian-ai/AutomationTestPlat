@@ -266,7 +266,7 @@ export default {
   margin: 2%;
 }
 .main {
-  width: 45%;
+  width: 30em;
   margin-left: 2%;
 }
 .main .footer {

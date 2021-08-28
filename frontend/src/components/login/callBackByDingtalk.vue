@@ -1,16 +1,16 @@
 <template>
-  <div v-if="loading">
-    <el-image :src="url" style="margin-left: 15%;"></el-image>
-    <p style="margin-left: 40%; font-size: 2em; ">客官莫急 俺正努力</p>
+  <div v-if="loading" style="text-align: center;">
+    <el-image :src="url"></el-image>
+    <p style="font-size: 2em;">客官莫急 俺正努力</p>
   </div>
   <div v-else class="main">
     <div class="box">
       <div class="sub_box">
         <p class="title">
           欢迎您，
-          <span style="color: red;">{{logonForm.nickname}}</span>:
+          <span style="color: red;">{{logonForm.nickname}} 吴迪</span> :
         </p>
-        <p class="title">您是首次登陆本平台，请先完成注册以授权。</p>
+        <p class="text">您是首次登陆本平台，请先完成注册以授权。</p>
         <el-divider></el-divider>
         <!-- 主要内容 -->
         <logon :ding="true" :form="logonForm"></logon>
@@ -104,21 +104,28 @@ export default {
   text-align: left;
   margin: 0.5em;
 }
+.text {
+  text-align: left;
+  font-size: 0.8em;
+  color: red;
+  margin: 0.5em;
+}
 .el-divider {
   padding: 0.3px;
   background-color: red;
 }
 .box {
   position: absolute;
-  left: 35%;
-  top: 15%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   border-radius: 5px;
   background-color: whitesmoke;
   width: 24em;
 }
 .sub_box {
   width: 22em;
-  margin-left: 1em;
   text-align: center;
+  margin-left: 1em;
 }
 </style>

@@ -39,7 +39,7 @@ class SmsCodeView(APIView):
             return Response({'msg': '验证短信发送过于频繁，请稍后再试'}, status=status.HTTP_403_FORBIDDEN)
 
         # 生成验证码
-        sms_code = random.randint(100000, 999999)
+        sms_code = str(random.randint(0, 999999)).zfill(6)
 
         # 创建redis管道对象，缓存验证码和发送标识
         pip = redis_conn.pipeline()

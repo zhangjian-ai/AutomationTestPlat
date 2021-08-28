@@ -1,5 +1,9 @@
 import axios from 'axios'
 
+/*
+    url传参时,变量位于地址最后,且无其他参数时,则不需要再加'/', 加了会重定向
+*/
+
 // 获取短信验证码
 export const send_sms_code = mobile => { return axios.get(`/oauth/sendSmsCode/${mobile}`) }
 
@@ -13,7 +17,7 @@ export const ding_login = code => { return axios.post('/oauth/dingTalk/', { code
 export const logon = data => { return axios.post('/logon/', data) }
 
 // 获取指定用户数
-export const check_user = param => { return axios.get('/userCount', { params: { param: param } }) }
+export const check_user = param => { return axios.get('/userCount/', { params: { param: param } }) }
 
 // 获取用户列表
 export const user_list = (param = null) => { return axios.get('/userList/', { params: { param: param } }) }
@@ -31,13 +35,13 @@ export const modules = () => { return axios.get('/modules/') }
 export const create_module = data => { return axios.post('/modules/', data) }
 
 // 用例列表
-export const case_list = (page, page_size, conditions) => { return axios.get('/caseList', { params: { page: page, page_size: page_size, conditions: conditions } }) }
+export const case_list = (page, page_size, conditions) => { return axios.get('/caseList/', { params: { page: page, page_size: page_size, conditions: conditions } }) }
 
 // xmind导入用例
 export const uploadXmindCase = async data => { return axios.post('/uploadXmindCase/', data) }
 
 // 获取用例信息
-export const query_case = (id = null, no = null) => { return axios.get('/case', { params: { id: id, no: no } }) }
+export const query_case = (id = null, no = null) => { return axios.get('/case/', { params: { id: id, no: no } }) }
 
 // 修改用例
 export const modify_case = data => { return axios.put('/case/', data) }
@@ -61,7 +65,7 @@ export const create_job = data => { return axios.post('/testJob/', data) }
 export const modify_job = data => { return axios.put('/testJob/', data) }
 
 // 获取测试任务列表
-export const job_list = (page, page_size, conditions) => { return axios.get('/jobList', { params: { page: page, page_size: page_size, conditions: conditions } }) }
+export const job_list = (page, page_size, conditions) => { return axios.get('/jobList/', { params: { page: page, page_size: page_size, conditions: conditions } }) }
 
 // 指派测试任务
 export const dispatch_job = data => { return axios.put('/dispatchJob/', data) }
@@ -70,7 +74,7 @@ export const dispatch_job = data => { return axios.put('/dispatchJob/', data) }
 export const job_list_detail = param => { return axios.get(`/jobListDetail/${param}`) }
 
 // 获取测试任务中的用例详情
-export const job_case_detail = (page, page_size, id) => { return axios.get(`/jobCaseDetail/${id}`, { params: { page: page, page_size: page_size } }) }
+export const job_case_detail = (page, page_size, id) => { return axios.get(`/jobCaseDetail/${id}/`, { params: { page: page, page_size: page_size } }) }
 
 // 上传图片
 export const uploadImage = data => { return axios.post('/image/', data) }

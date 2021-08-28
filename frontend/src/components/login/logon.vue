@@ -20,11 +20,11 @@
         <el-input v-model="logonForm.mobile"></el-input>
       </el-form-item>
       <el-form-item prop="smsCode" label="验证码">
-        <el-input v-model="logonForm.smsCode" palceholder="验证码" style="width: 8em;"></el-input>
+        <el-input v-model="logonForm.smsCode" palceholder="验证码" style="width: 40%;"></el-input>
         <el-button
           type="primary"
           @click="sendSmsCode()"
-          style="width: 8em; margin-left:2em;"
+          style="width: 35%; margin-left:5%;"
           :disabled="flag"
         >{{ tip }}</el-button>
       </el-form-item>
@@ -194,13 +194,13 @@ export default {
 <style scoped>
 .sub-box {
   text-align: left;
-  width: 20em;
+  width: 100%;
 }
 .el-input {
-  width: 18em;
+  width: 80%;
 }
 .el-button {
-  width: 20em;
-  margin-left: 2em;
+  width: 80%;
+  margin-left: 10%;
 }
 </style>

@@ -69,7 +69,7 @@ export default {
       content: "",
       editorOption: {
         theme: "snow",
-        placeholder: "记录您的测试结果",
+        placeholder: "记录您的测试详情",
         modules: {
           toolbar: {
             container: toolbarOptions,

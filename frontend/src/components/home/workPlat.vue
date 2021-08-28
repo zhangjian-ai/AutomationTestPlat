@@ -449,7 +449,7 @@ export default {
         });
       } else {
         this.$message.warning({
-          message: "测试结果不能为空"
+          message: "测试详情不能为空"
         });
       }
     },

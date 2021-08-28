@@ -115,7 +115,7 @@ export default {
 }
 .el-aside {
   text-align: center;
-  width: 12% !important;
+  width: 10em !important;
 }
 .el-aside .el-menu {
   width: 100%;
@@ -133,6 +133,14 @@ export default {
 }
 .el-menu /deep/ .el-submenu__title:hover {
   background: #294c6e !important;
+}
+.el-menu-item {
+  line-height: 2.8em !important;
+  height: 2.8em !important;
+}
+.el-menu /deep/ .el-submenu__title {
+  line-height: 3em !important;
+  height: 3em !important;
 }
 
 .header {

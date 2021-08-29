@@ -1,6 +1,7 @@
 <template>
   <el-container>
-    <el-aside>
+    <!-- 侧边栏 -->
+    <el-aside v-show="icon == 'el-icon-s-fold'">
       <!-- 菜单 -->
       <el-menu
         router
@@ -11,7 +12,7 @@
         active-text-color="#ffd04b"
       >
         <!-- LOGO -->
-        <el-image :src="url"></el-image>
+        <el-image :src="$store.state.logo_url"></el-image>
         <el-submenu index="1">
           <template slot="title">用例管理</template>
           <el-menu-item index="/caseList">
@@ -35,6 +36,12 @@
     <el-main>
       <!-- 头部 面包屑 -->
       <div class="header">
+        <el-col :span="1" class="hander">
+          <strong
+            :class="icon"
+            @click="icon = icon == 'el-icon-s-fold' ? 'el-icon-s-unfold' : 'el-icon-s-fold'"
+          ></strong>
+        </el-col>
         <el-col :span="5">
           <el-breadcrumb separator-class="el-icon-arrow-right">
             <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
@@ -61,12 +68,11 @@
   </el-container>
 </template>
 <script>
-import { get_image, modules, user_list, get_constants } from "@/api";
 export default {
   data() {
     return {
-      // LOGO
-      url: ""
+      // 隐藏侧边栏
+      icon: "el-icon-s-fold"
     };
   },
   methods: {
@@ -74,37 +80,13 @@ export default {
     logout() {
       this.$store.commit("setStatus");
       this.$router.replace("/login/account");
-    },
-
-    // 加载Image
-    loadImage() {
-      get_image("home").then(res => {
-        this.url = res.data.logo;
-      });
-      get_image("case").then(res => {
-        this.$store.commit("setCaseIcons", res.data);
-      });
-    },
-
-    // 加载搜索栏下拉框
-    loadOption() {
-      modules().then(res => {
-        this.$store.commit("setModules", res.data);
-      });
-      get_constants("CASE").then(res => {
-        this.$store.commit("setPriorities", res.data.LEVEL);
-      });
-      get_constants("JOB").then(res => {
-        this.$store.commit("setJobInfo", res.data);
-      });
-      user_list().then(res => {
-        this.$store.commit("setUsers", res.data);
-      });
     }
   },
   mounted() {
-    this.loadImage();
-    this.loadOption();
+    this.$store.dispatch("loadOption");
+    this.$store.dispatch("loadImage");
+    this.$store.dispatch("caseTree");
+    this.$store.dispatch("jobInductions");
   }
 };
 </script>
@@ -115,7 +97,7 @@ export default {
 }
 .el-aside {
   text-align: center;
-  width: 10em !important;
+  width: 11em !important;
 }
 .el-aside .el-menu {
   width: 100%;
@@ -141,6 +123,14 @@ export default {
 .el-menu /deep/ .el-submenu__title {
   line-height: 3em !important;
   height: 3em !important;
+}
+
+.hander {
+  text-align: left;
+  font-size: 1.6em;
+}
+.hander:hover {
+  color: darkgray;
 }
 
 .header {

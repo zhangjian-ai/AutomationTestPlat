@@ -78,7 +78,7 @@
       <div class="caselist">
         <el-input placeholder="关键字过滤" v-model="filterText" size="mini"></el-input>
         <el-tree
-          :data="treeData"
+          :data="$store.state.case_tree"
           show-checkbox
           node-key="id"
           :render-after-expand="false"
@@ -107,7 +107,7 @@
   </div>
 </template>
 <script>
-import { case_tree, create_job } from "@/api";
+import { create_job } from "@/api";
 export default {
   data() {
     return {
@@ -115,7 +115,6 @@ export default {
       filterText: "",
 
       // 列表树
-      treeData: [],
       defaultProps: {
         children: "subs",
         label: "name",
@@ -167,13 +166,6 @@ export default {
       return data.name.indexOf(value) !== -1;
     },
 
-    // 获取用例列表树数据
-    getCaseList() {
-      case_tree().then(res => {
-        this.treeData = res.data;
-      });
-    },
-
     // 节点选中状态变化的绑定事件。这里用不上第三个参数，所以没有入参
     handleChange(data, self) {
       if (data.cate == "case") {
@@ -203,15 +195,17 @@ export default {
               type: "error",
               message: "请勾选测试用例"
             });
-          } else {
-            this.jobForm.case = this.case;
-            create_job(this.jobForm).then(res => {
-              this.$message({
-                type: "success",
-                message: res.data.msg
-              });
-            });
+            return;
           }
+          this.jobForm.case = this.case;
+          create_job(this.jobForm).then(res => {
+            this.$message({
+              type: "success",
+              message: res.data.msg
+            });
+            // 刷新任务统计
+            this.$store.dispatch("jobInductions");
+          });
         }
       });
     }
@@ -241,9 +235,6 @@ export default {
       }
       return 0;
     }
-  },
-  mounted() {
-    this.getCaseList();
   }
 };
 </script>
@@ -272,10 +263,10 @@ export default {
   overflow: auto;
 }
 .el-tree /deep/ .el-tree-node__content:hover {
-  background-color: #91beca;
+  background-color: #488fa3;
 }
 .el-tree /deep/ .el-tree-node:focus > .el-tree-node__content {
-  background-color: #91beca;
+  background-color: #488fa3;
 }
 .caselist /deep/ input.el-input__inner {
   border-radius: 0;

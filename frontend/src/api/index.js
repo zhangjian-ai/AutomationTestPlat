@@ -64,6 +64,9 @@ export const create_job = data => { return axios.post('/testJob/', data) }
 // 修改测试任务
 export const modify_job = data => { return axios.put('/testJob/', data) }
 
+// 删除测试任务
+export const delete_job = id => { return axios.delete('/testJob/', { data: { id: id } }) }
+
 // 获取测试任务列表
 export const job_list = (page, page_size, conditions) => { return axios.get('/jobList/', { params: { page: page, page_size: page_size, conditions: conditions } }) }
 
@@ -84,3 +87,6 @@ export const deleteRemoteImage = url => { return axios.delete('/image/', { data:
 
 // 保存测试结果
 export const saveTestResult = data => { return axios.post('/testResult/', data) }
+
+// 获取测试任务统计面板,
+export const job_inductions = (scope = 'W') => { return axios.get(`/jobInductions/`, { params: { scope: scope } }) }

@@ -134,6 +134,9 @@ export default {
       this.count += response.data.count;
       this.title = `导入用例: ${this.count}`;
       this.success += response.data.success.join("\n") + "\n";
+
+      // 刷新用例树列表
+      this.$store.dispatch("caseTree");
     },
 
     // 上传失败时的回调函数

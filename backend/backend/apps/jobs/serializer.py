@@ -35,7 +35,7 @@ class JobSerializer(serializers.ModelSerializer):
     class Meta:
         model = Job
         fields = '__all__'
-        read_only_fields = ('id', 'task_no', 'create_user', 'create_time')
+        read_only_fields = ('id', 'task_no', 'create_user', 'create_time', 'is_active')
 
     def validate(self, attrs):
         # 相同名称的任务不允许创建

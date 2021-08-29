@@ -16,10 +16,11 @@ class Job(BaseModel):
     """测试任务模型"""
 
     task_no = models.BigIntegerField(unique=True, verbose_name="编号")
-    task_name = models.CharField(max_length=100, verbose_name="名称")
+    task_name = models.CharField(max_length=100, db_index=True, verbose_name="名称")
     task_detail = models.CharField(max_length=500, null=True, blank=True, verbose_name="详情")
     status = models.SmallIntegerField(choices=JOB['STATUS'], default=0, verbose_name="状态")
     level = models.SmallIntegerField(choices=JOB['LEVEL'], verbose_name="优先级")
+    is_active = models.BooleanField(default=True, verbose_name="可用状态")
     type = models.SmallIntegerField(choices=JOB['TYPE'], verbose_name="类型")
     create_user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="create_jobs", verbose_name="创建人")
     executor = models.ForeignKey(User, on_delete=models.PROTECT, related_name="jobs", null=True, blank=True,

@@ -211,6 +211,8 @@ export default {
               type: "success",
               message: res.data.msg
             });
+            // 刷新用例树列表
+            this.$store.dispatch("caseTree");
           });
         }
       });

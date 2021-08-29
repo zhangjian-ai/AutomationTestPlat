@@ -31,12 +31,13 @@ html,
   width: 100%;
 }
 
-/* 全局修改消息弹框样式 */
+/* 全局修改消息提示框样式 */
 .el-message {
-  top: 30px !important;
+  top: 4% !important;
   min-width: 5em !important;
   padding: 0.5em !important;
-  border-radius: 0 !important;
+  /* border-radius: 0 !important; */
+  background: white !important;
 }
 .el-message .el-message__content {
   font-size: 1em;

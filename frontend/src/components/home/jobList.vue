@@ -136,13 +136,18 @@
       <el-table-column prop="prd_no" label="关联需求号" min-width="120%" align="center"></el-table-column>
       <el-table-column label="操作" align="center" min-width="100%">
         <template slot-scope="scope">
-          <el-link type="primary" v-show="scope.row.status < 3" :underline="false">用例</el-link>
           <el-link
             v-show="scope.row.executor_name == null"
             :underline="false"
             type="primary"
             @click="openDialog([scope.row])"
           >指派</el-link>
+          <el-link
+            type="primary"
+            v-show="scope.row.status < 3"
+            :underline="false"
+            @click="deleteJob(scope.row.id)"
+          >取消</el-link>
         </template>
       </el-table-column>
     </el-table>
@@ -184,7 +189,7 @@
 </template>
 <script>
 import pagination from "../common/pagination.vue";
-import { job_list, dispatch_job } from "@/api";
+import { job_list, dispatch_job, delete_job } from "@/api";
 export default {
   data() {
     return {
@@ -296,6 +301,26 @@ export default {
             this.getJobs();
           });
         }
+      });
+    },
+
+    // 删除任务
+    deleteJob(id) {
+      this.$confirm("您确定取消该测试任务吗?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        delete_job(id).then(res => {
+          this.$message({
+            type: "success",
+            message: res.data.msg
+          });
+          // 刷新列表
+          this.getJobs();
+          // 刷新任务统计
+          this.$store.dispatch("jobInductions");
+        });
       });
     }
   },

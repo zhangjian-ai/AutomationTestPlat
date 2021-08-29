@@ -2,6 +2,7 @@ import json
 import re
 from datetime import datetime
 
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListAPIView
@@ -60,7 +61,7 @@ class JobView(APIView):
                     data['is_delay'] = True
 
                 # 加上实际结束时间
-                data['actual_end_time'] = datetime.now()
+                data['actual_end_time'] = timezone.datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
 
             serializer = JobSerializer(instance=job, data=data, partial=True)
             serializer.is_valid(raise_exception=True)
@@ -71,6 +72,20 @@ class JobView(APIView):
             return Response({'msg': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({'data': serializer.data, 'msg': '任务已关闭' if status == 4 else '状态已变更'})
+
+    def delete(self, request):
+        """删除用例"""
+        data = request.data
+        id = data.get('id')
+
+        try:
+            job = Job.objects.get(id=id)
+        except Job.DoesNotExist:
+            return Response({'msg': '任务不存在'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            job.is_active = False
+            job.save()
+            return Response({'msg': '任务已取消'})
 
 
 class JobListView(ListAPIView):
@@ -83,11 +98,12 @@ class JobListView(ListAPIView):
         conditions = self.request.query_params.get('conditions')
 
         if conditions == 'unfinish':
-            instance = Job.objects.filter(executor=self.request.user, status__in=[2, 3, 5]).order_by(
+            instance = Job.objects.filter(executor=self.request.user, status__in=[2, 3, 5], is_active=True).order_by(
                 'expect_end_time')
 
         elif conditions == 'finish':
-            instance = Job.objects.filter(executor=self.request.user, status=4).order_by('-actual_end_time')
+            instance = Job.objects.filter(executor=self.request.user, status=4, is_active=True).order_by(
+                '-actual_end_time')
 
         else:
             # 把字符串转换成对应的字典
@@ -104,7 +120,7 @@ class JobListView(ListAPIView):
             task_name = valid_conditions.pop('task_name', "")
 
             instance = Job.objects.filter(**valid_conditions, task_name__contains=task_name,
-                                          task_no__icontains=task_no).order_by('expect_end_time')
+                                          task_no__icontains=task_no, is_active=True).order_by('expect_end_time')
 
         return instance
 

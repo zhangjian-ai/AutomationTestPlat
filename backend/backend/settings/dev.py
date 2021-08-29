@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'files',
     'cases',
     'jobs',
+    'inductions',
 
 ]
 

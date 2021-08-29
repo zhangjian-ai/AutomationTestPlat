@@ -23,5 +23,6 @@ urlpatterns = [
     path('', include('files.urls')),  # 后台文件系统
     path('', include('cases.urls')),  # 用例上传
     path('', include('jobs.urls')),  # 测试任务
+    path('', include('inductions.urls')),  # 统计模块
 
 ]

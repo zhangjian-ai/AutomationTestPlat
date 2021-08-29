@@ -64,10 +64,10 @@ const routes = [
     children: [
       {
         path: '',
-        name: 'reporter',
-        component: () => import('@/components/home/reporter.vue'),
+        name: 'induction',
+        component: () => import('@/components/home/induction.vue'),
         meta: {
-          title: "看板",
+          title: "统计看板",
           requireAuth: true
         },
       },

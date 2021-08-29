@@ -378,9 +378,9 @@ export default {
             type: "success",
             message: res.data.msg
           });
+          // 刷新列表
+          this.getCases();
         });
-        // 刷新列表
-        this.getCases();
       });
     },
 

@@ -4,6 +4,7 @@
 .gitignore
 .DS_Store
 .pycahce
+venv
 
 ### frontend ###
 frontend/node_modules

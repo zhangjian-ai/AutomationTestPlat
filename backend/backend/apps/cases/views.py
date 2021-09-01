@@ -239,6 +239,7 @@ class XmindUploadCaseView(APIView):
         # 写入数据库
         success = list()
         serializer_list = list()
+        ids = list()
 
         # 用例筛选校验
         for sheet in xmind_dict:
@@ -331,6 +332,7 @@ class XmindUploadCaseView(APIView):
                 for serializer in serializer_list:
                     serializer.save()
                     success.append(f'[{content.__str__()}]-[{serializer.validated_data["name"]}]')
+                    ids.append(serializer.data.get('id'))
             except DatabaseError as e:
                 # 有任何异常都回退并返回
                 transaction.savepoint_rollback(save_id)
@@ -343,7 +345,7 @@ class XmindUploadCaseView(APIView):
             else:
                 # 无异常就提交事物
                 transaction.savepoint_commit(save_id)
-                return Response({'count': len(success), 'success': success}, status=status.HTTP_201_CREATED)
+                return Response({'count': len(success), 'success': success, 'ids': ids}, status=status.HTTP_201_CREATED)
 
 
 class ScriptUploadCaseView(APIView):

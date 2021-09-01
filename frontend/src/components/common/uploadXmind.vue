@@ -20,6 +20,13 @@
     >
       <el-button slot="trigger" size="mini" type="primary">选取文件</el-button>
       <el-button style="margin-left: 2em;" size="mini" type="success" @click="submit()">点击上传</el-button>
+      <el-button
+        v-show="ids.length > 0"
+        style="margin-left: 2em;"
+        size="mini"
+        type="danger"
+        @click="$router.push({name: 'job_create', params: {ids: ids}})"
+      >同步创建任务</el-button>
       <span v-if="loading" style="margin-left: 1em; color: grey; margin-bottom: 0;">
         <i class="el-icon-loading" slot="suffix"></i>用例导入中···
       </span>
@@ -66,7 +73,10 @@ export default {
 
       // 结果展示
       show: false,
-      loading: false
+      loading: false,
+
+      // 上传用例id
+      ids: []
     };
   },
   methods: {
@@ -134,6 +144,7 @@ export default {
       this.count += response.data.count;
       this.title = `导入用例: ${this.count}`;
       this.success += response.data.success.join("\n") + "\n";
+      this.ids = this.ids.concat(response.data.ids);
 
       // 刷新用例树列表
       this.$store.dispatch("caseTree");

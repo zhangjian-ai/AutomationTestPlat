@@ -177,7 +177,7 @@
                 <el-select
                   :disabled="[4, 5].indexOf(currentJob.status) != -1"
                   v-model="currentCase.case_status"
-                  filterable
+                  @change="submitTestResult()"
                   size="mini"
                   style="width: 7em; margin-right: 2em;"
                 >
@@ -189,12 +189,6 @@
                     :disabled="item[0] == 0"
                   ></el-option>
                 </el-select>
-                <el-button
-                  :disabled="[4, 5].indexOf(currentJob.status) != -1"
-                  size="mini"
-                  type="primary"
-                  @click="submitTestResult()"
-                >确 定</el-button>
               </template>
               <el-descriptions-item label="用例编号">{{ currentCase.case.no }}</el-descriptions-item>
               <el-descriptions-item
@@ -448,6 +442,7 @@ export default {
           }
         });
       } else {
+        this.currentCase.case_status = 0;
         this.$message.warning({
           message: "测试详情不能为空"
         });

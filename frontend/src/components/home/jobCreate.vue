@@ -170,7 +170,9 @@ export default {
     handleChange(data, self) {
       if (data.cate == "case") {
         if (self) {
-          this.case.push(data.id);
+          if (this.case.indexOf(data.id) == -1) {
+            this.case.push(data.id);
+          }
         } else {
           for (let i = 0; i < this.case.length; i++) {
             if (this.case[i] == data.id) {
@@ -234,6 +236,12 @@ export default {
         return this.case.length;
       }
       return 0;
+    }
+  },
+  mounted() {
+    // 从用例导入页面跳转过来,自动勾选导入成功的用例
+    if (this.$route.params.ids) {
+      this.$refs.tree.setCheckedKeys(this.$route.params.ids);
     }
   }
 };

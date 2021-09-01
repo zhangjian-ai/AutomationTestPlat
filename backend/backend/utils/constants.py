@@ -1,4 +1,6 @@
 # 短信验证码的过期时间单位秒
+import time
+
 SMS_CODE_EXPIRES = 300
 
 # 短信验证码发送时间周期
@@ -24,3 +26,9 @@ JOB = {
     'LEVEL': [(0, '紧急'), (1, '重要'), (2, '一般'), (3, '普通')],
     'CASE_STATUS': [(0, 'WAIT'), (1, 'PASS'), (2, 'FAIL'), (3, 'BLOCK'), (4, 'BREAK')]
 }
+
+if __name__ == '__main__':
+    a = input('请输入你的名字:')
+    print(bin(int(a)))
+    print(oct(int(a)))
+    print(hex(int(a)))

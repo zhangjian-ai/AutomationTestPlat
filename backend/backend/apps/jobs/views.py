@@ -24,11 +24,16 @@ class JobView(APIView):
         """创建任务"""
         data = request.data
 
-        serializer = JobSerializer(data=data, context=request.user)
+        context = {
+            'user': request.user
+        }
 
         # 创建时如果指定了责任人，那么任务状态直接为待测试
         if data.get('executor'):
             data['status'] = 2
+            context['tester'] = data.get('executor')
+
+        serializer = JobSerializer(data=data, context=context)
 
         try:
             serializer.is_valid(raise_exception=True)
@@ -129,7 +134,7 @@ class DispatchJobView(APIView):
     """指派任务视图"""
 
     def put(self, request):
-        user_id = request.data.get('user_id')
+        ids = request.data.get('ids')
         job_ids = request.data.get('job_ids')
 
         querySet = Job.objects.filter(id__in=job_ids)
@@ -137,12 +142,13 @@ class DispatchJobView(APIView):
         if not querySet:
             return Response({'msg': '要指派的测试任务不存在'}, status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            user = User.objects.get(id=user_id)
-        except User.DoesNotExist:
+        users = User.objects.filter(id__in=ids)
+        if users.count() == 0:
             return Response({'msg': '被指派人不存在'}, status=status.HTTP_400_BAD_REQUEST)
 
-        querySet.update(executor=user, status=2)
+        querySet.update(status=2)
+        for job in querySet:
+            job.executor.add(*users)
 
         return Response({'msg': '任务指派完成'})
 

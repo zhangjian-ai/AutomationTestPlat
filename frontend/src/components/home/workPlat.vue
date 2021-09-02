@@ -93,7 +93,7 @@
         </el-row>
         <el-descriptions :column="4" direction="vertical" border v-show="showJobs">
           <!-- <template slot="extra"></template> -->
-          <el-descriptions-item label="责任人">{{currentJob.executor_name }}</el-descriptions-item>
+          <el-descriptions-item label="测试人员">{{ currentJob.executor.join("/") }}</el-descriptions-item>
           <el-descriptions-item label="任务类型">{{ currentJob.type_str }}</el-descriptions-item>
           <el-descriptions-item label="计划完成时间">{{ currentJob.expect_end_time }}</el-descriptions-item>
           <el-descriptions-item label="属性标签">

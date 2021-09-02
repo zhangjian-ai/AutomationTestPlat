@@ -8,7 +8,6 @@
           <el-divider></el-divider>
         </div>
         <div class="form">
-          <span class="tips">&nbsp;创建任务提交之前请先勾选任务所需之用例</span>
           <el-form :model="jobForm" label-width="25%" ref="jobForm" :rules="rules" size="mini">
             <el-form-item label="任务名称:" prop="task_name">
               <el-input v-model="jobForm.task_name"></el-input>
@@ -40,8 +39,8 @@
                 ></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="责任人:">
-              <el-select v-model="jobForm.executor" filterable clearable>
+            <el-form-item label="测试:">
+              <el-select v-model="jobForm.executor" filterable clearable multiple>
                 <el-option
                   v-for="item in $store.state.users"
                   :key="item.id"
@@ -49,6 +48,15 @@
                   :value="item.id"
                 ></el-option>
               </el-select>
+            </el-form-item>
+            <el-form-item label="产品:">
+              <el-input v-model="jobForm.product"></el-input>
+            </el-form-item>
+            <el-form-item label="前端开发:">
+              <el-input v-model="jobForm.frontend"></el-input>
+            </el-form-item>
+            <el-form-item label="后端开发:">
+              <el-input v-model="jobForm.backend"></el-input>
             </el-form-item>
             <el-form-item label="关联需求:">
               <el-input v-model="jobForm.prd_no"></el-input>
@@ -286,7 +294,7 @@ export default {
 
 /* 表单部分样式 */
 .text_zone {
-  width: 30em;
+  width: 32em;
 }
 .title {
   width: 100%;
@@ -297,7 +305,7 @@ export default {
   margin: 0.2em 0;
 }
 .title .el-divider {
-  margin: 1em 0 2em 0;
+  margin: 1.2em 0 ;
   background-color: tomato;
   padding: 2px 0;
 }
@@ -305,11 +313,6 @@ export default {
   background-color: whitesmoke;
   padding: 1em 0 2em 0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
-}
-.form .tips {
-  font-size: 0.8em;
-  color: tomato;
-  margin-left: 2em;
 }
 .form .footer {
   text-align: right;
@@ -319,9 +322,6 @@ export default {
 .form .footer .el-button {
   margin-left: 3em;
 }
-.el-form-item {
-  margin: 2em 0;
-}
 .el-form-item >>> .el-textarea__inner {
   width: 80%;
 }
@@ -329,6 +329,6 @@ export default {
   width: 80%;
 }
 .form .el-select {
-  width: 30%;
+  width: 80%;
 }
 </style>

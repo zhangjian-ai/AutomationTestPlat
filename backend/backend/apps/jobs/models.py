@@ -23,12 +23,16 @@ class Job(BaseModel):
     is_active = models.BooleanField(default=True, verbose_name="可用状态")
     type = models.SmallIntegerField(choices=JOB['TYPE'], verbose_name="类型")
     create_user = models.ForeignKey(User, on_delete=models.PROTECT, related_name="create_jobs", verbose_name="创建人")
-    executor = models.ForeignKey(User, on_delete=models.PROTECT, related_name="jobs", null=True, blank=True,
-                                 verbose_name="责任人")
+    product = models.CharField(max_length=10, null=True, blank=True, verbose_name="产品")
+    frontend = models.CharField(max_length=20, null=True, blank=True, verbose_name="前端")
+    backend = models.CharField(max_length=20, null=True, blank=True, verbose_name="后端")
     prd_no = models.CharField(max_length=80, null=True, blank=True, verbose_name="关联需求编号")
     expect_end_time = models.DateTimeField(verbose_name="预期完成时间")
     actual_end_time = models.DateTimeField(null=True, blank=True, verbose_name="实际完成时间")
     is_delay = models.BooleanField(default=False, verbose_name="延期")
+    executor = models.ManyToManyField(User, related_name="jobs", through='JobRelateTester',
+                                      through_fields=('job', 'tester'),
+                                      verbose_name="测试人员")
     case = models.ManyToManyField(Case, related_name="jobs", through='JobToCase', through_fields=('job', 'case'),
                                   verbose_name="关联用例")
 
@@ -52,6 +56,17 @@ class JobToCase(BaseModel):
     class Meta:
         db_table = 'tp_job_case'
         verbose_name = '任务用例关联表'
+        verbose_name_plural = verbose_name
+
+
+class JobRelateTester(BaseModel):
+    """任务关联的测试人员"""
+    job = models.ForeignKey(Job, on_delete=models.CASCADE, verbose_name="任务")
+    tester = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="测试人员")
+
+    class Meta:
+        db_table = 'tp_job_tester'
+        verbose_name = '任务测试关联表'
         verbose_name_plural = verbose_name
 
 

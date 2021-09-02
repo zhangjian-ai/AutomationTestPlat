@@ -4,6 +4,8 @@ from datetime import datetime
 from rest_framework import serializers
 
 from cases.models import Case
+from users.models import User
+
 from .models import Job, JobToCase
 from cases.serializer import SimpleCaseSerializer
 
@@ -29,8 +31,10 @@ class JobSerializer(serializers.ModelSerializer):
     type_str = serializers.CharField(source='get_type_display', read_only=True)
 
     # 获取外键的str。字符类型序列化器，来源是外键对象时，默认返回对象的__str__()
-    create_user_name = serializers.CharField(source='create_user', read_only=True)
-    executor_name = serializers.CharField(source='executor', read_only=True, default="无")
+    create_user = serializers.StringRelatedField(read_only=True)
+
+    # 测试人员列表
+    executor = serializers.StringRelatedField(read_only=True, required=False, many=True)
 
     class Meta:
         model = Job
@@ -50,7 +54,7 @@ class JobSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # 添加无默认值的只读字段
         validated_data['task_no'] = '{0:%Y%m%d%H%M%S}'.format(datetime.now()) + str(random.randint(1000, 9999))
-        validated_data['create_user'] = self.context
+        validated_data['create_user'] = self.context.get('user')
 
         # 取出用例id列表
         ids = validated_data.pop('case')
@@ -63,6 +67,11 @@ class JobSerializer(serializers.ModelSerializer):
 
         # 任务绑定用例
         job.case.add(*caseSet)
+
+        # 添加测试人员关联
+        if self.context.get('tester'):
+            testers = User.objects.filter(id__in=self.context.get('tester'))
+            job.executor.add(*testers)
 
         return job
 

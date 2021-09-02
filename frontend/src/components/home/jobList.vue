@@ -125,19 +125,24 @@
       <el-table-column prop="status_str" label="状态" min-width="100%" align="center"></el-table-column>
       <el-table-column prop="level_str" label="优先级" min-width="120%" align="center"></el-table-column>
       <el-table-column prop="type_str" label="任务类型" min-width="100%" align="center"></el-table-column>
-      <el-table-column prop="executor_name" label="责任人" min-width="80%" align="center"></el-table-column>
+      <el-table-column label="测试人员" min-width="120%" align="center">
+        <template slot-scope="scope">{{ scope.row.executor.join("/") }}</template>
+      </el-table-column>
+      <el-table-column prop="product" label="产品" min-width="120%" align="center"></el-table-column>
+      <el-table-column prop="frontend" label="前端开发" min-width="120%" align="center"></el-table-column>
+      <el-table-column prop="backend" label="后端开发" min-width="120%" align="center"></el-table-column>
       <el-table-column prop="expect_end_time" label="计划完成时间" min-width="150%" align="center"></el-table-column>
       <el-table-column prop="actual_end_time" label="实际完成时间" min-width="150%" align="center"></el-table-column>
       <el-table-column prop="create_time" label="创建时间" min-width="150%" align="center"></el-table-column>
       <el-table-column label="延期" min-width="60%" align="center">
         <template slot-scope="scope">{{ scope.row.is_delay ? '是' : '否' }}</template>
       </el-table-column>
-      <el-table-column prop="create_user_name" label="创建人" min-width="80%" align="center"></el-table-column>
-      <el-table-column prop="prd_no" label="关联需求号" min-width="120%" align="center"></el-table-column>
+      <el-table-column prop="create_user" label="创建人" min-width="80%" align="center"></el-table-column>
+      <el-table-column prop="prd_no" label="关联需求" min-width="160%" align="center"></el-table-column>
       <el-table-column label="操作" align="center" min-width="100%">
         <template slot-scope="scope">
           <el-link
-            v-show="scope.row.executor_name == null"
+            v-show="scope.row.status < 2"
             :underline="false"
             type="primary"
             @click="openDialog([scope.row])"
@@ -169,8 +174,8 @@
         label-width="6em"
         size="mini"
       >
-        <el-form-item label="指派给:" prop="user_id">
-          <el-select v-model="dispatchForm.user_id" filterable>
+        <el-form-item label="指派给:" prop="ids">
+          <el-select v-model="dispatchForm.ids" filterable clearable multiple>
             <el-option
               v-for="item in $store.state.users"
               :key="item.id"
@@ -211,7 +216,7 @@ export default {
       dialogVisible: false,
       dispatchForm: {},
       dispatchRules: {
-        user_id: [
+        ids: [
           {
             required: true,
             message: "请选择指派人",
@@ -268,7 +273,7 @@ export default {
       // 校验是否被指派
       for (let i in rows) {
         // 校验是否已指派
-        if (rows[i].executor_name | rows[i].executor) {
+        if (rows[i].status >= 2) {
           this.$message({
             type: "warning",
             message: "已指派任务不能再次指派"

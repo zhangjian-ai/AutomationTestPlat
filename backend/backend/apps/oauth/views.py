@@ -27,6 +27,7 @@ class SmsCodeView(APIView):
     """
 
     permission_classes = []
+    authentication_classes = []
 
     def get(self, request, mobile):
         # 连接redis
@@ -48,7 +49,7 @@ class SmsCodeView(APIView):
         pip.execute()
 
         # 调用异步任务发送短信
-        send_sms_code(mobile, sms_code, constants.SMS_CODE_EXPIRES, constants.SMS_TEMPLATE_ID)
+        send_sms_code.delay(mobile, sms_code, constants.SMS_CODE_EXPIRES, constants.SMS_TEMPLATE_ID)
 
         # debug阶段将code返回
         return Response({'code': sms_code, 'msg': '短信验证验证码发送成功。'})

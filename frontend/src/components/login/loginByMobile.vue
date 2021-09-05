@@ -1,6 +1,6 @@
 <template>
   <div class="input_place">
-    <el-form :model="loginForm" :rules="rules">
+    <el-form :model="loginForm" :rules="rules" ref="loginForm">
       <el-form-item prop="mobile">
         <el-input v-model="loginForm.mobile" placeholder="请输入手机号" suffix-icon="el-icon-phone"></el-input>
       </el-form-item>

@@ -1,5 +1,7 @@
 import json
 import re
+import traceback
+import logging
 from datetime import datetime
 
 from django.utils import timezone
@@ -15,6 +17,9 @@ from users.models import User
 from django.conf import settings
 
 from backend.utils.fastdfs.FastDFSStorage import FastDFSStorage
+
+
+logger = logging.getLogger('test_plat')
 
 
 class JobView(APIView):
@@ -39,8 +44,10 @@ class JobView(APIView):
             serializer.is_valid(raise_exception=True)
             serializer.save()
         except ValidationError as e:
+            logger.error(traceback.format_exc())
             return Response({'msg': e.get_full_details()}, status=status.HTTP_400_BAD_REQUEST)
 
+        logger.info(f'测试任务创建成功，ID: {serializer.data["id"]}')
         return Response({'msg': '测试任务创建成功', 'data': serializer.data}, status=status.HTTP_201_CREATED)
 
     def get(self, request):
@@ -72,8 +79,10 @@ class JobView(APIView):
             serializer.is_valid(raise_exception=True)
             serializer.save()
         except Job.DoesNotExist:
+            logger.warning(f'任务不存在，ID: {id}')
             return Response({'msg': '任务不存在'}, status=status.HTTP_400_BAD_REQUEST)
         except ValidationError as e:
+            logger.error(traceback.format_exc())
             return Response({'msg': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({'data': serializer.data, 'msg': '任务已关闭' if status == 4 else '状态已变更'})
@@ -86,10 +95,12 @@ class JobView(APIView):
         try:
             job = Job.objects.get(id=id)
         except Job.DoesNotExist:
+            logger.warning(f'任务不存在，ID: {id}')
             return Response({'msg': '任务不存在'}, status=status.HTTP_400_BAD_REQUEST)
         else:
             job.is_active = False
             job.save()
+            logger.warning(f'任务已取消，ID: {id}')
             return Response({'msg': '任务已取消'})
 
 
@@ -140,16 +151,19 @@ class DispatchJobView(APIView):
         querySet = Job.objects.filter(id__in=job_ids)
 
         if not querySet:
+            logger.warning(f'要指派的测试任务不存在，ID: {job_ids}')
             return Response({'msg': '要指派的测试任务不存在'}, status=status.HTTP_400_BAD_REQUEST)
 
         users = User.objects.filter(id__in=ids)
         if users.count() == 0:
+            logger.warning(f'被指派人不存在，USER_ID: {ids}')
             return Response({'msg': '被指派人不存在'}, status=status.HTTP_400_BAD_REQUEST)
 
         querySet.update(status=2)
         for job in querySet:
             job.executor.add(*users)
 
+        logger.info(f'任务指派完成，USER_ID: {ids}，JOD_ID:{job_ids}')
         return Response({'msg': '任务指派完成'})
 
 
@@ -164,6 +178,7 @@ class JobCaseListView(ListAPIView):
         try:
             job = Job.objects.get(id=job_id)
         except Job.DoesNotExist:
+            logger.warning(f'测试任务不存在，ID: {job_id}')
             return Response({'msg': '测试任务不存在'}, status=status.HTTP_400_BAD_REQUEST)
 
         case = JobToCase.objects.filter(job=job)
@@ -198,8 +213,10 @@ class TestResultView(APIView):
             serializer.is_valid(raise_exception=True)
             serializer.save()
         except JobToCase.DoesNotExist:
+            logger.warning(traceback.format_exc())
             return Response({'msg': '任务和用例无关联'}, status=status.HTTP_400_BAD_REQUEST)
         except ValidationError as e:
+            logger.error(traceback.format_exc())
             return Response({'msg': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({'data': serializer.data, 'msg': '保存成功'})

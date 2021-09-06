@@ -1,6 +1,8 @@
 import json
 import random
 import time
+import traceback
+import logging
 from datetime import datetime
 
 import xmindparser
@@ -14,6 +16,9 @@ from rest_framework.views import APIView
 
 from .models import Module, Case
 from .serializer import CaseSerializer, ModuleSerializer, CaseDetailSerializer, CaseTreeSerializer
+
+
+logger = logging.getLogger('test_plat')
 
 
 class ModuleView(APIView):
@@ -36,6 +41,7 @@ class ModuleView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
+        logger.info(f"模块创建成功：【{serializer.data['name']}】")
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
@@ -88,6 +94,7 @@ class CaseView(APIView):
             try:
                 case = Case.objects.get(id=id)
             except Case.DoesNotExist:
+                logger.warning(f"用例不存在，ID：{id}")
                 return Response({'msg': '用例不存在'})
             else:
                 serializer = CaseSerializer(instance=case)
@@ -101,6 +108,7 @@ class CaseView(APIView):
             try:
                 Case.objects.get(no=no)
             except Case.DoesNotExist:
+                logger.warning(f"用例不存在，NO.：{no}")
                 return Response({'msg': '用例不存在'})
             else:
                 return Response()
@@ -119,6 +127,7 @@ class CaseView(APIView):
         except Case.DoesNotExist:
             pass
         else:
+            logger.warning(f"模块中已存在同名用例，NAME：{data['name']}")
             error = f"模块中已存在同名用例 [{data['name']}]"
             return Response({'msg': error}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -130,6 +139,7 @@ class CaseView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
+        logger.warning(f"用例添加成功，id：{serializer.data['id']}")
         return Response({'msg': '用例添加成功'}, status=status.HTTP_201_CREATED)
 
     def put(self, request):
@@ -140,6 +150,7 @@ class CaseView(APIView):
         try:
             case = Case.objects.get(id=id)
         except Case.DoesNotExist:
+            logger.warning(f"用例不存在，ID：{id}")
             return Response({'msg': '用例不存在'}, status=status.HTTP_400_BAD_REQUEST)
         else:
             # 修改用例
@@ -149,6 +160,7 @@ class CaseView(APIView):
                         try:
                             module = Module.objects.get(id=value)
                         except Case.DoesNotExist:
+                            logger.error(traceback.format_exc())
                             return Response({'msg': '当前勾选的模块不在系统中'}, status=status.HTTP_400_BAD_REQUEST)
                         else:
                             setattr(case, key, module)
@@ -182,10 +194,12 @@ class CaseView(APIView):
         try:
             case = Case.objects.get(id=id)
         except Case.DoesNotExist:
+            logger.warning(f"用例不存在，ID：{id}")
             return Response({'msg': '用例不存在'}, status=status.HTTP_400_BAD_REQUEST)
         else:
             case.status = False
             case.save()
+            logger.warning(f"用例已删除，ID：{case.id}")
             return Response({'msg': '用例已删除'})
 
 
@@ -249,18 +263,21 @@ class XmindUploadCaseView(APIView):
                 ins_module = Module.objects.get(name=name)
             except Module.DoesNotExist:
                 error = f'[{content.__str__()}] - [{name}] 不存在'
+                logger.error(traceback.format_exc())
                 return Response({'error': error})
 
             for module_1 in sheet.get('topic').get('topics'):
                 # 校验一级模块
                 if module_1.get("makers"):
                     error = f'[{content.__str__()}]-  [{name}] 下级必须是功能模块'
+                    logger.error(error)
                     return Response({'error': error})
                 name_1 = module_1.get('title')
                 try:
                     ins_module_1 = Module.objects.get(name=name_1, parent=ins_module)
                 except Module.DoesNotExist:
                     error = f'[{content.__str__()}]-[{name}] 下无模块 [{name_1}]，请先添加'
+                    logger.error(error)
                     return Response({'error': error})
 
                 for module_2 in module_1.get('topics'):
@@ -271,6 +288,7 @@ class XmindUploadCaseView(APIView):
                             ins_module_2 = Module.objects.get(name=name_2, parent=ins_module_1)
                         except Module.DoesNotExist:
                             error = f'[{content.__str__()}]-模块 [{name_1}] 下无模块 [{name_2}] ，请先添加'
+                            logger.error(error)
                             return Response({'error': error})
 
                         # 用例信息
@@ -283,6 +301,7 @@ class XmindUploadCaseView(APIView):
                     for case in case_list:
                         if not case.get("makers"):
                             error = f"[{content.__str__()}] - 用例 [{case.get('title')}] 用例等级必填"
+                            logger.error(error)
                             return Response({'error': error})
 
                         # 校验同一模块下是否有同名用例
@@ -294,6 +313,7 @@ class XmindUploadCaseView(APIView):
                             pass
                         else:
                             error = f'[{content.__str__()}] - 模块 [{name_1}] 中已存在用例 [{name}]  状态: {"可用" if ins.status else "不可用"}'
+                            logger.error(error)
                             return Response({'error': error})
 
                         priority = level_mapping.get(case.get("makers")[0], 2)
@@ -321,6 +341,7 @@ class XmindUploadCaseView(APIView):
                             serializer.is_valid(raise_exception=True)
                         except ValidationError as e:
                             error = f'[{content.__str__()}] - [{single_case["name"]}] 用例编号已存在' if '用例编号' in f'{e}' else f'[{content.__str__()}] - [{single_case["name"]}] 校验异常:\n >{e}'
+                            logger.error(error)
                             return Response({'error': error})
                         else:
                             serializer_list.append(serializer)
@@ -337,14 +358,17 @@ class XmindUploadCaseView(APIView):
                 # 有任何异常都回退并返回
                 transaction.savepoint_rollback(save_id)
                 error = f'[{content.__str__()}] 用例写入数据库失败:\n >{e}'
+                logger.error(traceback.format_exc())
                 return Response({'error': error})
             except Exception as e:
                 # 有任何异常都回退并返回
                 transaction.savepoint_rollback(save_id)
+                logger.error(traceback.format_exc())
                 return Response({'error': f'惊！发生未知异常！！！ \n {e}'})
             else:
                 # 无异常就提交事物
                 transaction.savepoint_commit(save_id)
+                logger.error(f'[{content.__str__()}] 用例导入完成！')
                 return Response({'count': len(success), 'success': success, 'ids': ids}, status=status.HTTP_201_CREATED)
 
 

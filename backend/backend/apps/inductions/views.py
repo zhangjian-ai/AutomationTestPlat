@@ -1,11 +1,15 @@
 import datetime
+import traceback
+import logging
 
-from django.shortcuts import render
 from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from jobs.models import Job
+
+
+logger = logging.getLogger('test_plat')
 
 
 class JobInductions(APIView):

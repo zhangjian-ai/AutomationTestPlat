@@ -1,14 +1,18 @@
 import re
+import traceback
+import logging
 
 from fdfs_client.exceptions import DataError
 from rest_framework import status
-from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Image
 from .serializer import SystemImageSerializer
 from backend.utils.fastdfs.FastDFSStorage import FastDFSStorage
+
+
+logger = logging.getLogger('test_plat')
 
 
 class SystemImageView(APIView):
@@ -29,6 +33,7 @@ class SystemImageView(APIView):
         try:
             querySet = Image.objects.filter(scope=map_scope[scope])
         except Image.DoesNotExist:
+            logger.warning(f'图片信息不存在，scope: {scope}')
             return Response({'msg': '图片信息不存在'}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = SystemImageSerializer(instance=querySet, many=True)
@@ -52,6 +57,7 @@ class ImageView(APIView):
             file_id = storage._save(name=content.__str__(), content=content)
             url = storage.url(file_id)
         except Exception as e:
+            logger.error(traceback.format_exc())
             return Response({'msg': f'图片上传失败:{e}'})
         return Response({'url': url}, status=status.HTTP_201_CREATED)
 
@@ -65,5 +71,6 @@ class ImageView(APIView):
         try:
             storage.delete(file_id)
         except DataError:
+            logger.warning(traceback.format_exc())
             return Response({'msg': '要删除的文件不存在'})
         return Response({'msg': f'{url}:删除成功'})

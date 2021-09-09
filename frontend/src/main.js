@@ -17,7 +17,7 @@ if (process.env.NODE_ENV == 'development') {
   axios.defaults.baseURL = 'http://127.0.0.1:8000/';
 }
 if (process.env.NODE_ENV == 'production') {
-  axios.defaults.baseURL = 'http://121.4.47.229:8000';
+  axios.defaults.baseURL = 'http://121.4.47.229:8000/';
 }
 
 // 默认携带cookie发起请求和保存cookie

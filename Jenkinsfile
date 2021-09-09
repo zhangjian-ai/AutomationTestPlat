@@ -25,6 +25,9 @@ pipeline {
                     sh script: "docker stop \$(docker ps -a | grep 'Exited' | awk '{print \$1 }')"
                     sh script: "docker rm \$(docker ps -a | grep 'Exited' | awk '{print \$1 }')"
                 }
+                echo "==================拷贝redis.conf到挂载目录=================="
+                // 在子目构建时，要用&&链接cd 的命令，因为每一个sh执行完之后，都会回到默认工作目录
+                sh script: "cp redis.conf /var/local/test_plat/redis/conf/redis.conf"
             }
         }
         stage("构建容器") {

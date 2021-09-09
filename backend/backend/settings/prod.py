@@ -256,7 +256,7 @@ DT_REDIRECT_URI = 'http://121.4.47.229:8090/callBack'
 DT_CLIENT_SECRET = 'FDCss73H328XKhNgkHAGndzkn-wPdaiVNuny-SShq3UNoGpWNJ38hjaREHf7DiQZ'
 
 # FastDFS 配置
-FDFS_URL = 'http://121.4.47.229:9999/'
+FDFS_URL = 'http://121.4.47.229:8888/'
 FDFS_CLIENT_CONF = os.path.join(BASE_DIR, 'utils/fastdfs/client.conf')
 
 # 指定自定义的django文件存储类

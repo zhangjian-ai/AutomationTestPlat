@@ -98,9 +98,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',  # 数据库引擎
         'HOST': '121.4.47.229',  # 数据库主机
-        'PORT': 3306,  # 数据库端口
-        'USER': 'tp_admin',  # 数据库用户名
-        'PASSWORD': 'tp_123456',  # 数据库用户密码
+        'PORT': 3300,  # 数据库端口
+        'USER': 'zm_admin',  # 数据库用户名
+        'PASSWORD': 'zm_123456',  # 数据库用户密码
         'NAME': 'test_plat'  # 数据库名字
     }
 }

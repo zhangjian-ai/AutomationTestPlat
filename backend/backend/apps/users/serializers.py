@@ -91,6 +91,9 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         # 取出密码
         password = validated_data.pop('password')
 
+        # 设置账号在职状态 1 在职  0 离职
+        validated_data['is_staff'] = 1
+
         # 新建用户对象
         user = User(**validated_data)
 

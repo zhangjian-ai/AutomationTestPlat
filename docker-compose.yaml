@@ -67,11 +67,6 @@ services:
     volumes:
       - /var/local/test_plat/redis/data:/data
       - /var/local/test_plat/redis/conf/redis.conf:/etc/redis/redis.conf:rw
-    logging:
-      driver: json-file
-      options:
-        max-size: "5m"
-        max-file: "3"
     command: redis-server /etc/redis/redis.conf --appendonly yes
     ports:
       - "6330:6379"

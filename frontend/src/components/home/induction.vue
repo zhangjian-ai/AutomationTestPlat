@@ -17,7 +17,7 @@
       </el-col>
     </el-row>
     <el-row>
-      <p>我是一块荒地 ...</p>
+      <!-- <p>我是一块荒地 ...</p> -->
     </el-row>
   </div>
 </template>

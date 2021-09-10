@@ -16,7 +16,7 @@
             <el-form
               :model="caseForm"
               size="mini"
-              label-width="25%"
+              label-width="30%"
               ref="caseForm"
               :rules="caseRules"
             >

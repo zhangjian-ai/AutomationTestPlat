@@ -8,7 +8,7 @@
       <div class="sub_box">
         <p class="title">
           欢迎您，
-          <span style="color: red;">{{logonForm.nickname}} 吴迪</span> :
+          <span style="color: red;">{{logonForm.nickname}}</span> :
         </p>
         <p class="text">您是首次登陆本平台，请先完成注册以授权。</p>
         <el-divider></el-divider>

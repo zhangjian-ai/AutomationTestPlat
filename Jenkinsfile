@@ -12,7 +12,7 @@ pipeline {
                 // 当前stage报错时，设置构建结果为成功，保证后续stage继续执行
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE'){
                     echo "==================关闭老版本容器=================="
-                    sh label: "停止后端容器", script: "docker-compose down"
+                    sh script: "docker-compose down"
                 }
             }
         }
@@ -32,7 +32,7 @@ pipeline {
         }
         stage("构建容器") {
             steps {
-                echo "==================构建后端服务器=================="
+                echo "==================构建镜像=================="
                 // 在子目构建时，要用&&链接cd 的命令，因为每一个sh执行完之后，都会回到默认工作目录
                 sh label: "构建镜像", script: "cd backend && docker build -t backend:latest ."
 
@@ -43,7 +43,7 @@ pipeline {
         stage("启动服务") {
             steps {
                 echo "==================启动容器=================="
-                sh label: "构建镜像", script: "docker-compose up -d"
+                sh script: "docker-compose up -d"
             }
         }
     }

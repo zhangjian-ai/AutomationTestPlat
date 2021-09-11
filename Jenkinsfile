@@ -7,7 +7,7 @@ pipeline {
         PATH = "$PATH:/usr/local/bin"
     }
     stages {
-        stage("close container") {
+        stage("关闭容器") {
             steps {
                 // 当前stage报错时，设置构建结果为成功，保证后续stage继续执行
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE'){
@@ -16,7 +16,7 @@ pipeline {
                 }
             }
         }
-        stage("clean environment") {
+        stage("环境清理") {
             steps {
                 // 当前stage报错时，设置构建结果为成功，保证后续stage继续执行
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE'){
@@ -25,12 +25,12 @@ pipeline {
                     sh script: "docker stop \$(docker ps -a | grep 'Exited' | awk '{print \$1 }')"
                     sh script: "docker rm \$(docker ps -a | grep 'Exited' | awk '{print \$1 }')"
                 }
-                echo "==================拷贝redis.conf到挂载目录=================="
+                // echo "==================拷贝redis.conf到挂载目录=================="
                 // 在子目构建时，要用&&链接cd 的命令，因为每一个sh执行完之后，都会回到默认工作目录
-                sh script: "cp redis.conf /var/local/test_plat/redis/conf/redis.conf"
+                // sh script: "cp redis.conf /var/local/test_plat/redis/conf/redis.conf"
             }
         }
-        stage("build images") {
+        stage("构建容器") {
             steps {
                 echo "==================构建镜像=================="
                 // 在子目构建时，要用&&链接cd 的命令，因为每一个sh执行完之后，都会回到默认工作目录
@@ -40,7 +40,7 @@ pipeline {
                 sh label: "构建镜像", script: "cd frontend && docker build -t frontend:latest ."
             }
         }
-        stage("start service") {
+        stage("启动服务") {
             steps {
                 echo "==================启动容器=================="
                 sh script: "docker-compose up -d"

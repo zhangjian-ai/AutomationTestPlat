@@ -57,7 +57,7 @@
       <pre style="margin:0; padding: 0;">&nbsp;</pre>
     </el-col>
     <!-- 工作区 -->
-    <el-col :span="showJobs ? 16 : 24" v-show="currentJob.task_no">
+    <el-col :span="showJobs ? 16 : 24" v-if="currentJob.task_no">
       <!-- 任务详情 -->
       <div class="job_detail">
         <el-row>
@@ -482,7 +482,9 @@ export default {
   },
   beforeDestroy() {
     // 再清理一次未使用的图片
-    this.$refs.richText.clearAllImage();
+    if (this.currentCase.id){
+        this.$refs.richText.clearAllImage();
+    }
   },
   components: {
     pagination,

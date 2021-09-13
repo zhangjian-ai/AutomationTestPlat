@@ -109,10 +109,10 @@ DATABASES = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://121.4.47.229:6379/7",
+        "LOCATION": "redis://121.4.47.229:6330/7",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "PASSWORD": "meiduo123",
+            "PASSWORD": "zm_123456",
             "DECODE_RESPONSES": True
         },
     },
@@ -245,8 +245,8 @@ AUTH_USER_MODEL = 'users.User'
 
 # CORS添加跨域白名单
 CORS_ORIGIN_WHITELIST = (
-    'http://127.0.0.1:8081',
-    'http://localhost:8081',
+    'http://127.0.0.1:8080',
+    'http://localhost:8080',
 )
 CORS_ALLOW_CREDENTIALS = True  # 允许携带cookie
 

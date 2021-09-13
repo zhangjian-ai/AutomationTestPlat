@@ -19,6 +19,7 @@
         </el-row>
         <el-divider></el-divider>
         <el-table
+          v-if="jobList.length > 0"
           :data="jobList"
           :show-header="false"
           highlight-current-row

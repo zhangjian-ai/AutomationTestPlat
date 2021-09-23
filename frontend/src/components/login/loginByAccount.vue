@@ -18,7 +18,7 @@
   </div>
 </template>
 <script>
-import { login } from "@/api";
+import { login, rsa_encrypt } from "@/api";
 export default {
   data() {
     return {
@@ -47,11 +47,19 @@ export default {
   },
   methods: {
     submit() {
-      login(this.loginForm).then(res => {
-        // 保存token信息
-        this.$store.commit("setStatus", res.data);
-        // 进入主页
-        this.$router.replace("/");
+      this.$refs.ruleForm.validate(valid => {
+        if (valid) {
+          let form = JSON.parse(JSON.stringify(this.loginForm))
+          // 用户密码加密
+          form.password = rsa_encrypt(form.password)
+          // 提交登陆
+          login(form).then(res => {
+            // 保存token信息
+            this.$store.commit("setStatus", res.data);
+            // 进入主页
+            this.$router.replace("/");
+          });
+        }
       });
     }
   }

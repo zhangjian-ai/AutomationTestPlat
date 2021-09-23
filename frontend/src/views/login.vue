@@ -97,6 +97,9 @@ export default {
     }
   },
   mounted() {
+    // 加载服务器公钥
+    this.$store.dispatch("loadPublicKey");
+
     // 避免一些奇怪的问题出现
     this.$router.replace("/login/account");
 

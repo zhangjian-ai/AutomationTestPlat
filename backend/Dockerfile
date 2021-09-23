@@ -13,5 +13,7 @@ RUN pip3 install -i https://pypi.doubanio.com/simple -r requirements.txt \
 && chmod +x ./start.sh \
 # Windows环境下编写的start.sh每行命令结尾有多余的\r字符，需移除。
 && sed -i 's/\r//' ./start.sh
+# 生成公钥私钥对
+&& python3 encrypt/make.py
 # 启动容器时运行脚本
 CMD ./start.sh

@@ -54,11 +54,15 @@ export default {
   },
   methods: {
     submit() {
-      login(this.loginForm).then(res => {
-        // 保存token信息
-        this.$store.commit("setStatus", res.data);
-        // 进入主页
-        this.$router.replace("/");
+      this.$refs.loginForm.validate(valid => {
+        if (valid) {
+          login(this.loginForm).then(res => {
+            // 保存token信息
+            this.$store.commit("setStatus", res.data);
+            // 进入主页
+            this.$router.replace("/");
+          });
+        }
       });
     },
     sendSmsCode() {

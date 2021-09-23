@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from encrypt.decrypt import decrypt
 from .models import User
 from .serializers import UserRegisterSerializer
 from backend.utils.helper import create_jwt_token
@@ -25,6 +26,14 @@ class UserRegisterView(CreateAPIView):
 
     # 指定序列化器
     serializer_class = UserRegisterSerializer
+
+    # 因为密码加密传输，需要解密请求参数
+    def create(self, request, *args, **kwargs):
+        # 解密密码
+        request.data['password'] = decrypt(request.data['password'])
+        request.data['password2'] = decrypt(request.data['password2'])
+        response = super().create(request, *args, **kwargs)
+        return response
 
 
 class CheckUserCount(APIView):
@@ -80,6 +89,9 @@ class UserLoginView(APIView):
             except User.DoesNotExist:
                 return Response({'msg': '用户不存在'}, status=status.HTTP_400_BAD_REQUEST)
             else:
+                # 解密密码
+                password = decrypt(password)
+
                 if user.check_password(password):
                     # 密码校验成功则返回登陆信息
                     token = create_jwt_token(user)

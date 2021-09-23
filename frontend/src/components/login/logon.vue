@@ -34,7 +34,7 @@
 </template>
 <script>
 /* eslint-disable */
-import { send_sms_code, logon, check_user } from "@/api";
+import { send_sms_code, logon, check_user, rsa_encrypt } from "@/api";
 export default {
   props: ["ding", "form"],
   data() {
@@ -137,7 +137,13 @@ export default {
     submit() {
       this.$refs.logonForm.validate(valid => {
         if (valid) {
-          logon(this.logonForm).then(res => {
+          let form = JSON.parse(JSON.stringify(this.logonForm));
+          // 用户密码加密
+          form.password = rsa_encrypt(form.password);
+          form.password2 = rsa_encrypt(form.password2);
+
+          // 提交表单
+          logon(form).then(res => {
             // 保存token信息
             this.$store.commit("setStatus", res.data);
             // 进入主页
@@ -181,7 +187,6 @@ export default {
     // 判断props是否传值
     checkProps() {
       if (this.subForm) {
-        // this.logonForm = JSON.parse(JSON.stringify(this.subForm));
         this.logonForm = this.subForm;
       }
     }

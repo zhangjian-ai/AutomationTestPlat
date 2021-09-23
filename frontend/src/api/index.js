@@ -4,6 +4,9 @@ import axios from 'axios'
     url传参时,变量位于地址最后,且无其他参数时,则不需要再加'/', 加了会重定向
 */
 
+// 获取服务器公钥
+export const get_public_key = () => { return axios.get(`/oauth/getPublicKey/`) }
+
 // 获取短信验证码
 export const send_sms_code = mobile => { return axios.get(`/oauth/sendSmsCode/${mobile}`) }
 
@@ -90,3 +93,21 @@ export const saveTestResult = data => { return axios.post('/testResult/', data) 
 
 // 获取测试任务统计面板,
 export const job_inductions = (scope = 'W') => { return axios.get(`/jobInductions/`, { params: { scope: scope } }) }
+
+
+
+import store from '../store'
+import JSEncrypt from 'jsencrypt'
+
+
+/**
+ * 对content进行RSA加密
+ * @param {*} content
+ */
+export const rsa_encrypt = content => {
+    let encryptor = new JSEncrypt() // 创建加密对象实例
+
+    encryptor.setPublicKey(store.state.public_key) // 设置公钥
+
+    return encryptor.encrypt(content) // 对内容进行加密, 可以在此打印下密文串
+}

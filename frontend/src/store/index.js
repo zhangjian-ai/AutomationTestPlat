@@ -1,13 +1,16 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-import { get_image, modules, user_list, get_constants, case_tree, job_inductions } from "@/api";
+import { get_image, modules, user_list, get_constants, case_tree, job_inductions, get_public_key } from "@/api";
 
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    // 服务器公钥
+    public_key: "",
+
     // 用户状态信息
     nickname: sessionStorage.nickname || localStorage.nickname,
     token: sessionStorage.token || localStorage.token,
@@ -46,6 +49,11 @@ export default new Vuex.Store({
 
   },
   mutations: {
+    // 保存公钥
+    setPublicKey(state, payload) {
+      state.public_key = payload
+    },
+
     // 修改用户状态
     setStatus(state, payload) {
       if (payload) {
@@ -119,6 +127,13 @@ export default new Vuex.Store({
 
   },
   actions: {
+    // 加载公钥
+    loadPublicKey(context) {
+      get_public_key().then(res => {
+        context.commit("setPublicKey", res.data.key)
+      })
+    },
+
     // 加载搜索栏下拉框
     loadOption(context) {
       modules().then(res => {

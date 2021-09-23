@@ -1,4 +1,5 @@
 import logging
+import os
 import random
 
 from django_redis import get_redis_connection
@@ -115,3 +116,17 @@ class DingTalkAuth(APIView):
                 'token': token,
                 'nickname': user.nickname
             })
+
+
+class CipherView(APIView):
+    """密钥视图"""
+
+    permission_classes = []
+
+    def get(self, request):
+        path = os.path.join(settings.BASE_DIR.__str__().rsplit('/')[0], 'encrypt', 'keys', 'public_key.pem')
+
+        with open(path, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        return Response({'key': content})

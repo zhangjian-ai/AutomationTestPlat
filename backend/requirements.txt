@@ -24,4 +24,4 @@ openpyxl==3.0.7
 django_crontab==0.7.1
 DingTalkLoginTool==0.0.2
 xmindparser==1.0.9
-cryptography==3.4.8
+pycryptodomex==3.10.1

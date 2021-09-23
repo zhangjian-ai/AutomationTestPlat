@@ -102,6 +102,7 @@ import JSEncrypt from 'jsencrypt'
 
 /**
  * 对content进行RSA加密
+ * npm install jsencrypt
  * @param {*} content
  */
 export const rsa_encrypt = content => {

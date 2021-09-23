@@ -1,5 +1,4 @@
 import logging
-import os
 import random
 
 from django_redis import get_redis_connection
@@ -14,6 +13,8 @@ from users.models import User
 from backend.utils.helper import create_jwt_token
 from backend.utils import constants
 from celery_tasks.sms.tasks import send_sms_code
+
+from encrypt.make import make
 
 logger = logging.getLogger('test_plat')
 
@@ -124,9 +125,7 @@ class CipherView(APIView):
     permission_classes = []
 
     def get(self, request):
-        path = os.path.join(settings.BASE_DIR.__str__().rsplit('/')[0], 'encrypt', 'keys', 'public_key.pem')
-
-        with open(path, 'r', encoding='utf-8') as f:
-            content = f.read()
+        # 每次访问本接口，动态生成公钥私钥对
+        content = make()
 
         return Response({'key': content})

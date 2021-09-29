@@ -11,18 +11,21 @@ from django.db import transaction, DatabaseError
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import ListAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Module, Case
 from .serializer import CaseSerializer, ModuleSerializer, CaseDetailSerializer, CaseTreeSerializer
-
+from backend.utils.custom_permissions import ModulePermission
 
 logger = logging.getLogger('test_plat')
 
 
 class ModuleView(APIView):
     """功能模块视图"""
+
+    permission_classes = [IsAuthenticated, ModulePermission]
 
     def get(self, request):
         instance = Module.objects.filter(parent=None)

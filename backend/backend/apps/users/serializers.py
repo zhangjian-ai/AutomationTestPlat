@@ -69,9 +69,9 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
         # 校验短信验证码
         redis_conn = get_redis_connection('default')
-        real_sms_code = redis_conn.get('sms_%s' % mobile)
+        real_sms_code = redis_conn.get('sms_%s' % mobile).decode()
 
-        if real_sms_code is None or attrs.get('smsCode') == real_sms_code:
+        if real_sms_code is None or attrs.get('smsCode') != real_sms_code:
             raise serializers.ValidationError('短信验证码错误或已过期。')
 
         # 校验否通过，则返回

@@ -265,11 +265,11 @@ DEFAULT_FILE_STORAGE = 'backend.utils.fastdfs.FastDFSStorage.FastDFSStorage'
 
 # 定时任务
 CRONJOBS = [
-    # 每1分钟执行一次该定时任务
+    # 每天执行一次该定时任务
     # 命令：
     # - python3 manage.py crontab add
     # - python3 manage.py crontab remove/show
-    ('*/1 * * * *', 'jobs.crons.turn_test_job_status',
+    ('* * 1 * *', 'encrypt.encrypt.produce',
      f'>> {os.path.join(os.path.dirname(BASE_DIR), "logs", "access.log")}')
 ]
 

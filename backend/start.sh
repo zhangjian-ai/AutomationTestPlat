@@ -8,8 +8,12 @@
 # 生成初始索引
 # python3 manage.py rebuild_index --noinput
 
+# 迁移数据库
 python3 manage.py makemigrations
 python3 manage.py migrate
+
+# 添加定时任务
+python3 manage.py crontab add  --noinput
 #uwsgi  --enable-threads uwsgi.ini
 nohup uwsgi --ini uwsgi.ini &
 

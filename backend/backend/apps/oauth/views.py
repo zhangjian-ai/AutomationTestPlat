@@ -14,7 +14,7 @@ from backend.utils.helper import create_jwt_token
 from backend.utils import constants
 from celery_tasks.sms.tasks import send_sms_code
 
-from encrypt.make import make
+from encrypt.encrypt import load_public_key
 
 logger = logging.getLogger('test_plat')
 
@@ -125,7 +125,7 @@ class CipherView(APIView):
     permission_classes = []
 
     def get(self, request):
-        # 每次访问本接口，动态生成公钥私钥对
-        content = make()
+        # 获取公钥
+        content = load_public_key()
 
         return Response({'key': content})

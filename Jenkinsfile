@@ -5,7 +5,7 @@ pipeline {
     }
     environment {
         PATH = "$PATH:/usr/local/bin"
-    }CD
+    }
     stages {
         stage("关闭容器") {
             steps {

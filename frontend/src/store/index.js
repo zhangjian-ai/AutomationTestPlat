@@ -38,7 +38,7 @@ export default new Vuex.Store({
     loading: "",
 
     // 静态文件链接
-    xmind_template_url: "",
+    xmind_template_id: 0,
 
     // 树结构用例列表
     case_tree: [],
@@ -108,9 +108,9 @@ export default new Vuex.Store({
       }
     },
     // 设置系统静态文件链接
-    setStaticFileUrl(state, payload) {
+    setStaticFile(state, payload) {
       if (payload) {
-        state.xmind_template_url = payload.xmind_template
+        state.xmind_template_id = payload.xmind_template
       }
     },
     // 创建任务页面的用例列表
@@ -166,7 +166,7 @@ export default new Vuex.Store({
     // 加载静态文件
     loadStaticFile(context) {
       get_file().then(res => {
-        context.commit("setStaticFileUrl", res.data)
+        context.commit("setStaticFile", res.data)
       })
     },
 

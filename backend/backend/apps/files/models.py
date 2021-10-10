@@ -23,12 +23,16 @@ class Image(BaseModel):
 class File(BaseModel):
     """系统文件库"""
     file = models.FileField(verbose_name="文件地址")
+    name = models.CharField(max_length=20, verbose_name="文件名称")
     scope = models.SmallIntegerField(choices=RESOURCE['FILE'], unique=True, verbose_name="作用域")
 
     class Meta:
         db_table = "tp_file"
         verbose_name = "系统文件"
         verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.name
 
 
 # ******************下面的操作是为了在删除数据库数据时，同时删除掉fastDFS里面保存的文件*****************

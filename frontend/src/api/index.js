@@ -28,6 +28,9 @@ export const get_image = () => { return axios.get(`/image/`) }
 // 获取系统静态文件链接
 export const get_file = () => { return axios.get(`/file/`) }
 
+// 下载静态文件
+export const download = id => { return axios.post("/file/", { temp_id: id }, { responseType: 'blob' }) }
+
 // 登陆
 export const login = data => { return axios.post('/login/', data) }
 

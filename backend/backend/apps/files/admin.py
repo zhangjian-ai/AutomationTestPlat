@@ -12,4 +12,4 @@ class ImageAdmin(admin.ModelAdmin):
 @admin.register(File)
 class ImageAdmin(admin.ModelAdmin):
     # 设置现实字段
-    list_display = ['id', 'scope', 'file', 'create_time']
+    list_display = ['id', 'name', 'scope', 'file', 'create_time']

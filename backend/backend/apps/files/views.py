@@ -2,6 +2,7 @@ import re
 import traceback
 import logging
 
+from django.http import HttpResponse
 from fdfs_client.exceptions import DataError
 from rest_framework import status
 from rest_framework.response import Response
@@ -73,6 +74,30 @@ class FileView(APIView):
         serializer = SystemFileSerializer(instance=querySet, many=True)
         image = dict()
         for data in serializer.data:
-            image[data['scope_str']] = data['file']
+            image[data['scope_str']] = data['id']
 
         return Response(image)
+
+    def post(self, request):
+        # 获取前端传入的file_id
+        temp_id =request.data.get('temp_id')
+
+        # 根据file_id获取文件名
+        try:
+            query = File.objects.get(id=temp_id)
+        except File.DoesNotEixst:
+            return Response({'msg': '静态资源不存在'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 从仓库读取文件流
+        dfs = FastDFSStorage()
+        content = dfs.client.download_to_buffer(query.file.__str__().encode())
+
+        # 获取二进制文件，存入响应对象
+        response = HttpResponse(content['Content'], content_type='application/octet-stream')
+        # 添加自定义响应头，传递文件名
+        response['Content-Dispositon'] = f"attachment; filename={query.name}"
+        # 暴露自定义header，这样在js中才能获取到该值
+        response['Access-Control-Expose-Headers'] = 'Content-Dispositon'
+
+        return response
+

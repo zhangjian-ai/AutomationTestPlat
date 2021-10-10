@@ -25,7 +25,7 @@
         size="mini"
         icon="el-icon-download"
         type="primary"
-        :href="$store.state.xmind_template_url"
+        @click="download_xmind_template"
       >xmind 模版</el-link>
       <el-button
         v-show="ids.length > 0"
@@ -65,7 +65,7 @@
 </template>
 <script>
 /* eslint-disable */
-import { uploadXmindCase } from "@/api";
+import { uploadXmindCase, download } from "@/api";
 export default {
   props: [],
   data() {
@@ -169,6 +169,32 @@ export default {
       this.success = "";
       this.count = 0;
       this.show = false;
+    },
+
+    // 下载模板
+    download_xmind_template() {
+      download(this.$store.state.xmind_template_id).then(res => {
+        let content = res.data;
+        // FileReader主要用于将文件内容读入内存
+        let reader = new FileReader();
+        reader.readAsDataURL(content);
+        // onload当读取操作成功完成时调用
+        reader.onload = function(e) {
+          // 创建一个超链接标签a
+          let a = document.createElement("a");
+          // 获取文件名fileName
+          let fileName = res.headers["content-dispositon"].split("=");
+          // 直接调用属性名设置download属性
+          console.log(fileName);
+          a.download = fileName[fileName.length - 1];
+          // 这是href属性，另一种设置属性的方法
+          a.setAttribute("href", e.target.result);
+          // 将其添加到body中，点击时调用href，然后再
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        };
+      });
     }
   }
 };

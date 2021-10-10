@@ -1,5 +1,5 @@
 <template>
-  <div class="main" :style="{backgroundImage: 'url('+url+')',backgroundSize: '100% 100%'}">
+  <div class="main" :style="{backgroundImage: 'url('+$store.state.login_url+')',backgroundSize: '100% 100%'}">
     <!-- 内容盒子 -->
     <el-row class="box">
       <div class="sub_box">
@@ -37,13 +37,9 @@
   </div>
 </template>
 <script>
-import { get_image } from "@/api";
 export default {
   data() {
     return {
-      // 背景图链接
-      url: "",
-
       // 注册登陆切换
       title: ["用 户 登 陆", "用 户 注 册"],
       titleLink: ["立即注册", "已有账号"],
@@ -88,12 +84,6 @@ export default {
         ];
         this.$router.replace(this.currentType[0]);
       }
-    },
-    // 加载Image
-    loadImage() {
-      get_image("login").then(res => {
-        this.url = res.data.background;
-      });
     }
   },
   mounted() {
@@ -104,7 +94,7 @@ export default {
     this.$router.replace("/login/account");
 
     // 加载背景图片
-    this.loadImage();
+    this.$store.dispatch("loadImage");
   }
 };
 </script>

@@ -1,14 +1,11 @@
 import axios from 'axios'
 
-/*
-    url传参时,变量位于地址最后,且无其他参数时,则不需要再加'/', 加了会重定向
-*/
 
 // 获取服务器公钥
 export const get_public_key = () => { return axios.get(`/oauth/getPublicKey/`) }
 
 // 获取短信验证码
-export const send_sms_code = mobile => { return axios.get(`/oauth/sendSmsCode/${mobile}`) }
+export const send_sms_code = mobile => { return axios.get(`/oauth/sendSmsCode/${mobile}/`) }
 
 // 获取钉钉登陆链接
 export const login_by_ding = (code = null) => { return axios.get('/oauth/dingTalk/', { params: { loginTmpCode: code } }) }
@@ -26,7 +23,10 @@ export const check_user = param => { return axios.get('/userCount/', { params: {
 export const user_list = (param = null) => { return axios.get('/userList/', { params: { param: param } }) }
 
 // 获取系统图片资源链接
-export const get_image = scope => { return axios.get(`/getImage/${scope}`) }
+export const get_image = () => { return axios.get(`/image/`) }
+
+// 获取系统静态文件链接
+export const get_file = () => { return axios.get(`/file/`) }
 
 // 登陆
 export const login = data => { return axios.post('/login/', data) }
@@ -77,7 +77,7 @@ export const job_list = (page, page_size, conditions) => { return axios.get('/jo
 export const dispatch_job = data => { return axios.put('/dispatchJob/', data) }
 
 // 获取测试任务列表详情
-export const job_list_detail = param => { return axios.get(`/jobListDetail/${param}`) }
+export const job_list_detail = param => { return axios.get(`/jobListDetail/${param}/`) }
 
 // 获取测试任务中的用例详情
 export const job_case_detail = (page, page_size, id) => { return axios.get(`/jobCaseDetail/${id}/`, { params: { page: page, page_size: page_size } }) }

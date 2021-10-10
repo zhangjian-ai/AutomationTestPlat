@@ -37,8 +37,8 @@ class FastDFSStorage(Storage):
         :return: 保存到数据库中的FastDFS的文件名
         """
         # client.upload_by_filename 该上方法传入的是绝对路径的文件，在storage保存的文件是带有文件后缀名的
-        # upload_by_buffer传入的是content二进制文件，在storage保存后没有后缀名
-        ret = self.client.upload_by_buffer(content.read())
+        # upload_by_buffer传入的是content二进制文件，在storage保存后没有后缀名，需要显示指定
+        ret = self.client.upload_by_buffer(content.read(), file_ext_name=name.split('.')[-1])
         if ret.get("Status") != "Upload successed.":
             raise Exception("upload file failed")
         file_id = ret.get("Remote file_id")

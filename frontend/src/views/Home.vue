@@ -83,8 +83,9 @@ export default {
     }
   },
   mounted() {
-    this.$store.dispatch("loadOption");
     this.$store.dispatch("loadImage");
+    this.$store.dispatch("loadStaticFile");
+    this.$store.dispatch("loadOption");
     this.$store.dispatch("caseTree");
     this.$store.dispatch("jobInductions");
   }

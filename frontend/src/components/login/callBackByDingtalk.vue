@@ -1,6 +1,6 @@
 <template>
   <div v-if="loading" style="text-align: center;">
-    <el-image :src="url"></el-image>
+    <el-image :src="$store.state.loading"></el-image>
     <p style="font-size: 2em;">客官莫急 俺正努力</p>
   </div>
   <div v-else class="main">
@@ -20,7 +20,7 @@
   </div>
 </template>
 <script>
-import { ding_login, get_image } from "@/api";
+import { ding_login } from "@/api";
 import logon from "@/components/login/logon.vue";
 export default {
   data() {
@@ -30,7 +30,6 @@ export default {
 
       // 加载等待，gif地址
       loading: true,
-      url: "",
 
       // 首次扫码时，注册表单
       logonForm: {}
@@ -77,16 +76,8 @@ export default {
         }
       });
     },
-
-    // 加载image
-    loadImage() {
-      get_image("login").then(res => {
-        this.url = res.data.loading;
-      });
-    }
   },
   mounted() {
-    this.loadImage();
     this.getCode();
     this.loginByDing(this.code);
   },

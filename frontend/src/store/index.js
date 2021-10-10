@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-import { get_image, modules, user_list, get_constants, case_tree, job_inductions, get_public_key } from "@/api";
+import { get_image, get_file, modules, user_list, get_constants, case_tree, job_inductions, get_public_key } from "@/api";
 
 
 Vue.use(Vuex)
@@ -21,10 +21,6 @@ export default new Vuex.Store({
     // 用例等级
     priorities: [],
 
-    // 用例自动化图标
-    correct: "",
-    error: "",
-
     // 用户列表
     users: [],
 
@@ -34,8 +30,15 @@ export default new Vuex.Store({
     status: [],
     case_status: [],
 
-    // logo_url
+    // 静态图片链接
     logo_url: "",
+    login_url: "",
+    auto_true: "",
+    auto_false: "",
+    loading: "",
+
+    // 静态文件链接
+    xmind_template_url: "",
 
     // 树结构用例列表
     case_tree: [],
@@ -79,13 +82,6 @@ export default new Vuex.Store({
         state.priorities = payload
       }
     },
-    // 用例自动化图标
-    setCaseIcons(state, payload) {
-      if (payload) {
-        state.correct = payload.true;
-        state.error = payload.false;
-      }
-    },
     // 用户列表
     setUsers(state, payload) {
       if (payload) {
@@ -101,10 +97,20 @@ export default new Vuex.Store({
         state.case_status = payload.CASE_STATUS
       }
     },
-    // 主页LOGO链接
-    setLogo(state, payload) {
+    // 设置系统图片链接
+    setImageUrl(state, payload) {
       if (payload) {
-        state.logo_url = payload
+        state.logo_url = payload.logo;
+        state.login_url = payload.login;
+        state.auto_false = payload.auto_false;
+        state.auto_true = payload.auto_true;
+        state.loading = payload.loading
+      }
+    },
+    // 设置系统静态文件链接
+    setStaticFileUrl(state, payload) {
+      if (payload) {
+        state.xmind_template_url = payload.xmind_template
       }
     },
     // 创建任务页面的用例列表
@@ -152,12 +158,16 @@ export default new Vuex.Store({
 
     // 加载Image
     loadImage(context) {
-      get_image("home").then(res => {
-        context.commit("setLogo", res.data.logo);
+      get_image().then(res => {
+        context.commit("setImageUrl", res.data);
       });
-      get_image("case").then(res => {
-        context.commit("setCaseIcons", res.data);
-      });
+    },
+
+    // 加载静态文件
+    loadStaticFile(context) {
+      get_file().then(res => {
+        context.commit("setStaticFileUrl", res.data)
+      })
     },
 
     // 获取用例列表树数据

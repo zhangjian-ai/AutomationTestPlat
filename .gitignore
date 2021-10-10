@@ -5,6 +5,7 @@
 .DS_Store
 .pycahce
 venv
+logs/
 
 ### frontend ###
 frontend/node_modules

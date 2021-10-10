@@ -9,9 +9,10 @@ SMS_CODE_INTERVAL = 60
 # 测试短信模板ID
 SMS_TEMPLATE_ID = 1
 
-# 系统图片使用位置分类
-IMAGE = {
-    'SCOPE': [(0, 'login'), (1, 'home'), (2, 'case'), (3, 'job')]
+# 静态资源
+RESOURCE = {
+    'IMAGE': [(0, 'login'), (1, 'logo'), (2, 'auto_true'), (3, 'auto_false'), (4, 'loading')],
+    'FILE': [(0, 'xmind_template')]
 }
 
 # 测试用例常量
@@ -26,9 +27,3 @@ JOB = {
     'LEVEL': [(0, '紧急'), (1, '重要'), (2, '一般'), (3, '普通')],
     'CASE_STATUS': [(0, 'WAIT'), (1, 'PASS'), (2, 'FAIL'), (3, 'BLOCK'), (4, 'BREAK')]
 }
-
-if __name__ == '__main__':
-    a = input('请输入你的名字:')
-    print(bin(int(a)))
-    print(oct(int(a)))
-    print(hex(int(a)))

@@ -1,7 +1,7 @@
 from django.db import models
 
 from backend.utils.models import BaseModel
-from backend.utils.constants import IMAGE
+from backend.utils.constants import RESOURCE
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
 
@@ -11,17 +11,24 @@ from backend.utils.fastdfs.FastDFSStorage import FastDFSStorage
 class Image(BaseModel):
     """系统图片库"""
 
-    image = models.ImageField(verbose_name="地址")
-    name = models.CharField(max_length=20, unique=True, verbose_name="名称")
-    scope = models.SmallIntegerField(choices=IMAGE['SCOPE'], verbose_name="作用域")
+    image = models.ImageField(verbose_name="图片地址")
+    scope = models.SmallIntegerField(choices=RESOURCE['IMAGE'], unique=True, verbose_name="作用域")
 
     class Meta:
         db_table = "tp_image"
         verbose_name = "系统图片"
         verbose_name_plural = verbose_name
 
-    def __str__(self):
-        return self.name
+
+class File(BaseModel):
+    """系统文件库"""
+    file = models.FileField(verbose_name="文件地址")
+    scope = models.SmallIntegerField(choices=RESOURCE['FILE'], unique=True, verbose_name="作用域")
+
+    class Meta:
+        db_table = "tp_file"
+        verbose_name = "系统文件"
+        verbose_name_plural = verbose_name
 
 
 # ******************下面的操作是为了在删除数据库数据时，同时删除掉fastDFS里面保存的文件*****************
@@ -33,3 +40,8 @@ def delete_storage(sender, **kwargs):
     storage = FastDFSStorage()
     storage.delete(kwargs['instance'].image.__str__())
 
+
+@receiver(post_delete, sender=File)
+def delete_storage(sender, **kwargs):
+    storage = FastDFSStorage()
+    storage.delete(kwargs['instance'].file.__str__())

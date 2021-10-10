@@ -19,7 +19,14 @@
       :auto-upload="false"
     >
       <el-button slot="trigger" size="mini" type="primary">选取文件</el-button>
-      <el-button style="margin-left: 2em;" size="mini" type="success" @click="submit()">点击上传</el-button>
+      <el-button style="margin: 0 2em;" size="mini" type="success" @click="submit()">点击上传</el-button>
+      <el-link
+        style="padding-top: 0.5em;"
+        size="mini"
+        icon="el-icon-download"
+        type="primary"
+        :href="$store.state.xmind_template_url"
+      >xmind 模版</el-link>
       <el-button
         v-show="ids.length > 0"
         style="margin-left: 2em;"
@@ -177,6 +184,7 @@ export default {
   height: 40em;
 }
 .tips {
+  margin: 2em 0 0;
   font-size: 0.5em;
   color: orangered;
 }

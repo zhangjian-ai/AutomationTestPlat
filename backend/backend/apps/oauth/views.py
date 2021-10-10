@@ -54,7 +54,7 @@ class SmsCodeView(APIView):
         send_sms_code.delay(mobile, sms_code, constants.SMS_CODE_EXPIRES, constants.SMS_TEMPLATE_ID)
 
         # debug阶段将code返回
-        return Response({'code': sms_code, 'msg': '短信验证验证码发送成功。'})
+        return Response({'code': sms_code, 'msg': '短信验证码发送成功。'})
 
 
 class DingTalkAuth(APIView):

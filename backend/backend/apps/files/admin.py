@@ -6,4 +6,10 @@ from .models import *
 @admin.register(Image)
 class ImageAdmin(admin.ModelAdmin):
     # 设置现实字段
-    list_display = ['id', 'name', 'scope', 'image', 'create_time']
+    list_display = ['id', 'scope', 'image', 'create_time']
+
+
+@admin.register(File)
+class ImageAdmin(admin.ModelAdmin):
+    # 设置现实字段
+    list_display = ['id', 'scope', 'file', 'create_time']

@@ -27,16 +27,17 @@
         type="primary"
         @click="download_xmind_template"
       >xmind 模版</el-link>
-      <el-button
-        v-show="ids.length > 0"
-        style="margin-left: 2em;"
-        size="mini"
-        type="danger"
-        @click="$router.push({name: 'job_create', params: {ids: ids}})"
-      >同步创建任务</el-button>
-      <span v-if="loading" style="margin-left: 1em; color: grey; margin-bottom: 0;">
-        <i class="el-icon-loading" slot="suffix"></i>用例导入中···
-      </span>
+      <div class="hiden">
+        <el-button
+          v-show="ids.length > 0"
+          size="mini"
+          type="danger"
+          @click="$router.push({name: 'job_create', params: {ids: ids}})"
+        >同步创建任务</el-button>
+        <span v-if="loading" style="color: grey; margin-bottom: 0;">
+          <i class="el-icon-loading" slot="suffix"></i>用例导入中···
+        </span>
+      </div>
       <div slot="tip" class="tips">提示: 只能上传xmind文件</div>
     </el-upload>
     <!-- 导入结果展示 -->
@@ -229,5 +230,8 @@ export default {
 .result .title {
   font-size: 1.2em;
   font-weight: bolder;
+}
+.hiden {
+  margin-top: 1em;
 }
 </style>

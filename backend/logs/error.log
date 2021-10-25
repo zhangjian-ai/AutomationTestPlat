@@ -8,3 +8,26 @@
 [2021-08-28 18:36:19,789][views][81][ERROR][缺少code码，登录失败。]
 [2021-08-28 18:36:24,002][views][81][ERROR][缺少code码，登录失败。]
 [2021-10-09 23:37:47,597][views][319][ERROR][[xmind用例写作模板.xmind] - 模块 [合同管理] 中已存在用例 [用例名称 1]  状态: 可用]
+[2021-10-25 11:20:44,806][views][283][ERROR][[#37893 资产-办公室电池明细报表优化.xmind]-[观星台] 下无模块 [资产数据]，请先添加]
+[2021-10-25 11:43:42,829][views][374][ERROR][[#37893 资产-办公室电池明细报表优化.xmind] 用例导入完成！]
+[2021-10-25 11:47:01,998][views][269][ERROR][Traceback (most recent call last):
+  File "/Users/zhangjian/PycharmProjects/AutomationTestPlat/backend/backend/apps/cases/views.py", line 266, in post
+    ins_module = Module.objects.get(name=name, parent_id=None)
+  File "/Users/zhangjian/PycharmProjects/AutomationTestPlat/venv/lib/python3.8/site-packages/django/db/models/manager.py", line 85, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "/Users/zhangjian/PycharmProjects/AutomationTestPlat/venv/lib/python3.8/site-packages/django/db/models/query.py", line 429, in get
+    raise self.model.DoesNotExist(
+cases.models.Module.DoesNotExist: Module matching query does not exist.
+]
+[2021-10-25 11:47:16,199][views][269][ERROR][Traceback (most recent call last):
+  File "/Users/zhangjian/PycharmProjects/AutomationTestPlat/backend/backend/apps/cases/views.py", line 266, in post
+    ins_module = Module.objects.get(name=name, parent_id=None)
+  File "/Users/zhangjian/PycharmProjects/AutomationTestPlat/venv/lib/python3.8/site-packages/django/db/models/manager.py", line 85, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+  File "/Users/zhangjian/PycharmProjects/AutomationTestPlat/venv/lib/python3.8/site-packages/django/db/models/query.py", line 429, in get
+    raise self.model.DoesNotExist(
+cases.models.Module.DoesNotExist: Module matching query does not exist.
+]
+[2021-10-25 11:48:13,182][views][374][ERROR][[#37893 资产-办公室电池明细报表优化.xmind] 用例导入完成！]
+[2021-10-25 11:50:39,840][views][374][ERROR][[#37893 资产-办公室电池明细报表优化.xmind] 用例导入完成！]
+[2021-10-25 11:53:21,704][views][374][ERROR][[#37893 资产-办公室电池明细报表优化.xmind] 用例导入完成！]

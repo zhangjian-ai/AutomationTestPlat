@@ -263,7 +263,7 @@ class XmindUploadCaseView(APIView):
             # 校验根级模块
             name = sheet.get('topic').get('title')
             try:
-                ins_module = Module.objects.get(name=name)
+                ins_module = Module.objects.get(name=name, parent_id=None)
             except Module.DoesNotExist:
                 error = f'[{content.__str__()}] - [{name}] 不存在'
                 logger.error(traceback.format_exc())
@@ -323,7 +323,7 @@ class XmindUploadCaseView(APIView):
 
                         info = case.get('topics')[0]
                         step = info.get('title')
-                        expectation = info.get('topics')[0].get('title')
+                        expectation = info.get('topics')[0].get('title') if info.get('topics') else None
 
                         single_case = dict()
                         single_case['no'] = 'test_' + '{0:%Y%m%d%H%M%S}'.format(datetime.now()) + str(

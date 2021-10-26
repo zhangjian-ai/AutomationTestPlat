@@ -7,8 +7,8 @@ class CaseSerializer(serializers.ModelSerializer):
     """用例序列化器"""
 
     # 用例详情字段
-    description = serializers.CharField(max_length=100, allow_null=True, required=False, write_only=True, label="用例描述")
-    expectation = serializers.CharField(max_length=100, allow_null=True, required=False, write_only=True, label="测试步骤")
+    description = serializers.CharField(max_length=500, allow_null=True, required=False, write_only=True, label="用例描述")
+    expectation = serializers.CharField(max_length=500, allow_null=True, required=False, write_only=True, label="测试步骤")
     step = serializers.CharField(max_length=250, allow_null=True, required=False, write_only=True, label="测试步骤")
     path = serializers.CharField(max_length=200, allow_null=True, required=False, write_only=True, label="A执行路径")
 

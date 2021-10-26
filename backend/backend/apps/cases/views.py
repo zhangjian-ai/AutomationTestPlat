@@ -321,9 +321,13 @@ class XmindUploadCaseView(APIView):
 
                         priority = level_mapping.get(case.get("makers")[0], 2)
 
-                        info = case.get('topics')[0]
-                        step = info.get('title')
-                        expectation = info.get('topics')[0].get('title') if info.get('topics') else None
+                        if hasattr(case, 'topics'):
+                            info = case.get('topics')[0]
+                            step = info.get('title')
+                            expectation = info.get('topics')[0].get('title') if info.get('topics') else None
+                        else:
+                            step = None
+                            expectation = None
 
                         single_case = dict()
                         single_case['no'] = 'test_' + '{0:%Y%m%d%H%M%S}'.format(datetime.now()) + str(

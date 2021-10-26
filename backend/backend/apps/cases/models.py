@@ -61,8 +61,8 @@ class CaseDetail(models.Model):
     case = models.OneToOneField(Case, on_delete=models.CASCADE, related_name="detail", verbose_name="用例")
 
     description = models.CharField(max_length=100, null=True, blank=True, verbose_name="A用例描述")
-    step = models.CharField(max_length=250, null=True, blank=True, verbose_name="测试步骤")
-    expectation = models.CharField(max_length=100, null=True, blank=True, verbose_name="测试步骤")
+    step = models.CharField(max_length=500, null=True, blank=True, verbose_name="测试步骤")
+    expectation = models.CharField(max_length=500, null=True, blank=True, verbose_name="测试步骤")
     path = models.CharField(max_length=200, null=True, blank=True, verbose_name="A执行路径")
 
     class Meta:

@@ -100,7 +100,7 @@
       <el-table-column type="selection" align="center"></el-table-column>
       <el-table-column label="序号" type="index" min-width="50%" align="center"></el-table-column>
       <el-table-column prop="no" label="用例编号" min-width="200%" align="center"></el-table-column>
-      <el-table-column prop="name" label="用例名称" min-width="250%" align="center"></el-table-column>
+      <el-table-column prop="name" label="用例名称" min-width="250%" align="left"></el-table-column>
       <el-table-column label="功能模块" min-width="200%">
         <template
           slot-scope="scope"

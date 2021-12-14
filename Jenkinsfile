@@ -3,16 +3,16 @@ pipeline {
     options {
         disableConcurrentBuilds()
     }
-//     environment {
-//         PATH = "$PATH:/usr/local/bin"
-//     }
+    environment {
+        PATH = "$PATH:/usr/bin"
+    }
     stages {
         stage("关闭容器") {
             steps {
                 // 当前stage报错时，设置构建结果为成功，保证后续stage继续执行
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE'){
                     echo "==================关闭老版本容器=================="
-                    sh script: "docker-compose down"
+                    sh script: "sudo docker-compose down"
                 }
             }
         }

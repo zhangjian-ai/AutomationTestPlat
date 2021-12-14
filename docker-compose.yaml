@@ -4,8 +4,8 @@ networks:
   extnetwork:
     ipam:
       config:
-        - subnet: 172.19.0.0/16
-          gateway: 172.19.0.1
+        - subnet: 172.33.0.0/24
+          gateway: 172.33.0.1
 
 services:
   server:
@@ -21,7 +21,7 @@ services:
         max-file: "5"
     networks:
       extnetwork:
-        ipv4_address: 172.19.0.2
+        ipv4_address: 172.33.0.2
 #    depends_on:
 #      - mysql
 #    links:
@@ -34,7 +34,7 @@ services:
     restart: always
     networks:
       extnetwork:
-        ipv4_address: 172.19.0.3
+        ipv4_address: 172.33.0.3
     depends_on:
       - server
     links:

@@ -16,7 +16,7 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 from .routing import urlpatterns
 
 # 配置文件上线时需要修改为线上配置文件
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings.dev')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings.prod')
 
 # application = get_asgi_application()
 application = ProtocolTypeRouter({

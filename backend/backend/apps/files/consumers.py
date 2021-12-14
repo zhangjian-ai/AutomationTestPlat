@@ -6,7 +6,7 @@ from channels.exceptions import StopConsumer
 from django.db import DataError
 from fdfs_client.exceptions import DataError as FdfsDataError, ConnectionError
 
-from .models import SourceModel
+from files.models import SourceModel
 from files.serializer import SourceListSerializer
 from backend.utils.fastdfs.FastDFSStorage import FastDFSStorage
 from rest_framework.exceptions import ValidationError

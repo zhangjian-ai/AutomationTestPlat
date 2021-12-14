@@ -18,6 +18,9 @@ from .routing import urlpatterns
 # 配置文件上线时需要修改为线上配置文件
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings.prod')
 
+import django
+django.setup()
+
 # application = get_asgi_application()
 application = ProtocolTypeRouter({
     'http': get_asgi_application(),

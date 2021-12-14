@@ -16,13 +16,18 @@
 
 # 添加定时任务
 python manage.py crontab add
-#uwsgi  --enable-threads uwsgi.ini
+
+# uwsgi  --enable-threads uwsgi.ini
 nohup uwsgi --ini uwsgi.ini &
+
+# 注意：执行daphne时，需要在manage.py的同级目录
 nohup daphne -b 0.0.0.0 -p 8001 backend.asgi:application &
+
 # 保持容器内部有一个前台进程在运行,这里用消息队列保持
 while true
 do
   sleep 1
 done
+
 # celery 暂时不使用
 #celery -A celery_tasks.main worker -l info

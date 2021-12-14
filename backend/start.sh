@@ -15,10 +15,11 @@
 # python3 manage.py migrate
 
 # 添加定时任务
-python3 manage.py crontab add  --noinput
+python3 manage.py crontab add
 #uwsgi  --enable-threads uwsgi.ini
-nohup uwsgi --ini uwsgi.ini &
-nohup daphne -b 0.0.0.0 -p 8001 backend.asgi:application
+# -d 标识后台运行
+uwsgi -d --ini uwsgi.ini &
+daphne -b 0.0.0.0 -p 8001 backend.asgi:application
 # 保持容器内部有一个前台进程在运行,这里用消息队列保持
 while true
 do

@@ -6,20 +6,21 @@ It exposes the ASGI callable as a module-level variable named ``application``.
 For more information on this file, see
 https://docs.djangoproject.com/en/3.1/howto/deployment/asgi/
 """
+from .wsgi import *
 
 import os
 import django
 
 from django.core.asgi import get_asgi_application
 
-from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.routing import ProtocolTypeRouter, URLRouter, get_default_application
 
 from .routing import urlpatterns
 
-django.setup()
 
 # 配置文件上线时需要修改为线上配置文件
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings.prod')
+django.setup()
 
 # application = get_asgi_application()
 application = ProtocolTypeRouter({

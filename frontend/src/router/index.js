@@ -108,6 +108,16 @@ const routes = [
         },
       },
       {
+        path: 'sourceList',
+        name: 'source_list',
+        component: () => import('@/components/home/sourceList.vue'),
+        meta: {
+          title: "资源列表",
+          requireAuth: true,
+          keepAlive: true
+        },
+      },
+      {
         path: 'workPlat',
         name: 'work_plat',
         component: () => import('@/components/home/workPlat.vue'),

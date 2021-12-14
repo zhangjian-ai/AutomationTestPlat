@@ -13,7 +13,7 @@ services:
     container_name: TP_server
     restart: always
     volumes:
-      - /var/local/test_plat/server/logs:/var/www/html/backend/logs
+      - /var/local/myapp/TP_server/logs:/var/www/html/backend/logs
     logging:
       driver: json-file
       options:
@@ -22,10 +22,10 @@ services:
     networks:
       extnetwork:
         ipv4_address: 172.19.0.2
-    depends_on:
-      - mysql
-    links:
-      - mysql
+#    depends_on:
+#      - mysql
+#    links:
+#      - mysql
 
 
   web:
@@ -41,61 +41,60 @@ services:
       - server
     ports:
       - "8090:80"
-      - "8000:8000"
 
 
   #---------------第一次构建时请打开注释----------------
-  mysql:
-    image: mysql:5.7.13
-    container_name: TP_mysql
-    restart: always
-    volumes:
-      - /var/local/test_plat/mysql/data:/var/lib/mysql
-    environment:
-      - MYSQL_ROOT_PASSWORD=zm_123456
-      - MYSQL_DATABASE=test_plat
-      - MYSQL_USER=zm_admin
-      - MYSQL_PASSWORD=zm_123456
-    command: [ '--character-set-server=utf8mb4','--collation-server=utf8mb4_unicode_ci' ]
-    ports:
-      - "3300:3306"
-
-  redis:
-    image: redis:4.0
-    container_name: TP_redis
-    restart: always
-    volumes:
-      - /var/local/test_plat/redis/data:/data
-      - /var/local/test_plat/redis/conf/redis.conf:/etc/redis/redis.conf:rw
-    command: redis-server /etc/redis/redis.conf --appendonly yes
-    ports:
-      - "6330:6379"
-
-  tracker:
-    # tracker默认端口22122，不用专门映射
-    image: delron/fastdfs
-    container_name: TP_FastDFS-tracker
-    restart: always
-    volumes:
-      - /var/local/test_plat/fdfs/tracker:/var/fdfs
-    network_mode: "host"
-    command: tracker
-
-
-  storage:
-    # storage默认端口8888
-    image: delron/fastdfs
-    container_name: TP_FastDFS-storage
-    restart: always
-    volumes:
-      - /var/local/test_plat/fdfs/storage:/var/fdfs
-    network_mode: "host"
-    command: storage
-    environment:
-      - TRACKER_SERVER=121.4.47.229:22122
-    depends_on:
-      - tracker
-
+#  mysql:
+#    image: mysql:5.7.13
+#    container_name: TP_mysql
+#    restart: always
+#    volumes:
+#      - /var/local/test_plat/mysql/data:/var/lib/mysql
+#    environment:
+#      - MYSQL_ROOT_PASSWORD=zm_123456
+#      - MYSQL_DATABASE=test_plat
+#      - MYSQL_USER=zm_admin
+#      - MYSQL_PASSWORD=zm_123456
+#    command: [ '--character-set-server=utf8mb4','--collation-server=utf8mb4_unicode_ci' ]
+#    ports:
+#      - "3300:3306"
+#
+#  redis:
+#    image: redis:4.0
+#    container_name: TP_redis
+#    restart: always
+#    volumes:
+#      - /var/local/test_plat/redis/data:/data
+#      - /var/local/test_plat/redis/conf/redis.conf:/etc/redis/redis.conf:rw
+#    command: redis-server /etc/redis/redis.conf --appendonly yes
+#    ports:
+#      - "6330:6379"
+#
+#  tracker:
+#    # tracker默认端口22122，不用专门映射
+#    image: delron/fastdfs
+#    container_name: TP_FastDFS-tracker
+#    restart: always
+#    volumes:
+#      - /var/local/test_plat/fdfs/tracker:/var/fdfs
+#    network_mode: "host"
+#    command: tracker
+#
+#
+#  storage:
+#    # storage默认端口8888
+#    image: delron/fastdfs
+#    container_name: TP_FastDFS-storage
+#    restart: always
+#    volumes:
+#      - /var/local/test_plat/fdfs/storage:/var/fdfs
+#    network_mode: "host"
+#    command: storage
+#    environment:
+#      - TRACKER_SERVER=121.4.47.229:22122
+#    depends_on:
+#      - tracker
+#
 
 #---------------第一次构建时请打开注释----------------
 

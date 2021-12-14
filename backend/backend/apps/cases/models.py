@@ -57,7 +57,7 @@ class CaseDetail(models.Model):
 
     # 正向查询：当前模型对象.外键字段名  CaseDetail.case
     # 反向查询(未指定relation)：外键模型对象.当前模型类名小写  Case.casedetail
-    # 指定了关联名，则同一对多
+    # 反向查询，指定了关联名，则同一对多。如下的反向查询可以使用：Case.detail
     case = models.OneToOneField(Case, on_delete=models.CASCADE, related_name="detail", verbose_name="用例")
 
     description = models.CharField(max_length=100, null=True, blank=True, verbose_name="A用例描述")

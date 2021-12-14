@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',  # 解决跨域问题
     'django_crontab',  # 定时任务
+    'channels',  # asgi
 
     # 自定义app
     'users',
@@ -97,9 +98,9 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',  # 数据库引擎
-        'HOST': '121.4.47.229',  # 数据库主机
+        'HOST': '101.43.61.175',  # 数据库主机
         'PORT': 3300,  # 数据库端口
-        'USER': 'zm_admin',  # 数据库用户名
+        'USER': 'root',  # 数据库用户名
         'PASSWORD': 'zm_123456',  # 数据库用户密码
         'NAME': 'test_plat'  # 数据库名字
     }
@@ -109,7 +110,7 @@ DATABASES = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://121.4.47.229:6330/7",
+        "LOCATION": "redis://101.43.61.175:6330/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "PASSWORD": "zm_123456",
@@ -257,7 +258,7 @@ DT_REDIRECT_URI = 'http://127.0.0.1:8081/callBack'
 DT_CLIENT_SECRET = 'FDCss73H328XKhNgkHAGndzkn-wPdaiVNuny-SShq3UNoGpWNJ38hjaREHf7DiQZ'
 
 # FastDFS 配置
-FDFS_URL = 'http://121.4.47.229:8888/'
+FDFS_URL = 'http://101.43.61.175:8888/'
 FDFS_CLIENT_CONF = os.path.join(BASE_DIR, 'utils/fastdfs/client.conf')
 
 # 指定自定义的django文件存储类
@@ -275,6 +276,10 @@ CRONJOBS = [
 
 # 解决crontab中文问题
 CRONTAB_COMMAND_PREFIX = 'LANG_ALL=zh_cn.UTF-8'
+
+# ==========ASGI==========
+ASGI_APPLICATION = 'backend.asgi.application'
+
 
 if __name__ == '__main__':
     print(BASE_DIR)

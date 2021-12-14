@@ -1,15 +1,18 @@
+import json
 import re
 import traceback
 import logging
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
 from fdfs_client.exceptions import DataError
 from rest_framework import status
+from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import *
-from .serializer import SystemImageSerializer, SystemFileSerializer
+from .serializer import SystemImageSerializer, SystemFileSerializer, SourceListSerializer
 from backend.utils.fastdfs.FastDFSStorage import FastDFSStorage
 
 logger = logging.getLogger('test_plat')
@@ -80,13 +83,13 @@ class FileView(APIView):
 
     def post(self, request):
         # 获取前端传入的file_id
-        temp_id =request.data.get('temp_id')
+        temp_id = request.data.get('temp_id')
 
         # 根据file_id获取文件名
         try:
             query = File.objects.get(id=temp_id)
-        except File.DoesNotEixst:
-            return Response({'msg': '静态资源不存在'}, status=status.HTTP_400_BAD_REQUEST)
+        except ObjectDoesNotExist:
+            return Response({'msg': '静态资源不存在'}, status=status.HTTP_404_NOT_FOUND)
 
         # 从仓库读取文件流
         dfs = FastDFSStorage()
@@ -101,3 +104,43 @@ class FileView(APIView):
 
         return response
 
+
+class SourceListView(ListAPIView):
+    """资源视图"""
+    serializer_class = SourceListSerializer
+
+    def get_queryset(self):
+        # 获取请求参数，前端传入的对象，被默认转成了字符串：'{}'
+        conditions = self.request.query_params.get('conditions')
+        # 把字符串转换成对应的字典
+        conditions = json.loads(conditions)
+
+        # 处理掉空值，避免干扰查询
+        valid_conditions = dict()
+        for key, value in conditions.items():
+            if value not in ("", None):
+                valid_conditions[key] = value
+
+        # 资源名称提供模糊查询
+        name = valid_conditions.pop('name', "")
+
+        # 创建时间为范围匹配
+        create_time = valid_conditions.pop('create_time', None)
+
+        if create_time:
+            instances = SourceModel.objects.filter(**valid_conditions, name__contains=name,
+                                                   create_time__gte=create_time[0],
+                                                   create_time__lte=create_time[1]).values()
+        else:
+            instances = SourceModel.objects.filter(**valid_conditions, name__contains=name).values()
+
+        # 根据uid进行分组。Django ORM 的分组很拉垮
+        temp_list = []
+        source_list = []
+
+        for item in instances:
+            if item['uid'] not in temp_list:
+                temp_list.append(item['uid'])
+                source_list.append(item)
+
+        return source_list

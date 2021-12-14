@@ -38,7 +38,7 @@ class FastDFSStorage(Storage):
         """
         # client.upload_by_filename 该上方法传入的是绝对路径的文件，在storage保存的文件是带有文件后缀名的
         # upload_by_buffer传入的是content二进制文件，在storage保存后没有后缀名，需要显示指定
-        ret = self.client.upload_by_buffer(content.read(), file_ext_name=name.split('.')[-1])
+        ret = self.client.upload_by_buffer(content if type(content) == bytes else content.read(), file_ext_name=name.split('.')[-1])
         if ret.get("Status") != "Upload successed.":
             raise Exception("upload file failed")
         file_id = ret.get("Remote file_id")

@@ -35,3 +35,5 @@ cases.models.Module.DoesNotExist: Module matching query does not exist.
 [2021-10-26 12:09:03,525][views][347][ERROR][[#34535-商户线-支持子规则特殊付款新增门店.xmind] - [crm延长合作期限-有剩余付款金额和均摊金额-子规则新增门店] 校验异常:
  >{'expectation': [ErrorDetail(string='请确保这个字段不能超过 100 个字符。', code='max_length')]}]
 [2021-10-26 12:18:31,621][views][378][ERROR][[#34535-商户线-支持子规则特殊付款新增门店.xmind] 用例导入完成！]
+[2021-10-26 15:14:41,814][views][294][ERROR][[# 32355 商户线-审批原因标准化.xmind]-模块 [工作流] 下无模块 [预置审批理由] ，请先添加]
+[2021-10-26 15:14:56,971][views][378][ERROR][[#34535-商户线-支持子规则特殊付款新增门店.xmind] 用例导入完成！]

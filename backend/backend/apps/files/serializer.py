@@ -22,3 +22,12 @@ class SystemFileSerializer(serializers.ModelSerializer):
         model = File
         fields = '__all__'
 
+
+class SourceListSerializer(serializers.ModelSerializer):
+    """资源列表序列化器"""
+
+    create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', read_only=True)
+
+    class Meta:
+        model = SourceModel
+        fields = '__all__'

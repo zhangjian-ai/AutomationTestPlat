@@ -18,11 +18,10 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('oauth/', include('oauth.urls')),  # 登陆认证
-    path('', include('users.urls')),  # 账号管理
-    path('', include('files.urls')),  # 后台文件系统
-    path('', include('cases.urls')),  # 用例上传
-    path('', include('jobs.urls')),  # 测试任务
-    path('', include('inductions.urls')),  # 统计模块
-
+    path('api/', include('oauth.urls')),  # 登陆认证
+    path('api/', include('users.urls')),  # 账号管理
+    path('api/', include('files.urls')),  # 后台文件系统
+    path('api/', include('cases.urls')),  # 用例上传
+    path('api/', include('jobs.urls')),  # 测试任务
+    path('api/', include('inductions.urls')),  # 统计模块
 ]

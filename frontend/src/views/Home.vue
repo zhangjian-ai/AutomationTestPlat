@@ -31,6 +31,12 @@
             <span slot="title">新建任务</span>
           </el-menu-item>
         </el-submenu>
+        <el-submenu index="3">
+          <template slot="title">资源管理</template>
+          <el-menu-item index="/sourceList">
+            <span slot="title">资源列表</span>
+          </el-menu-item>
+        </el-submenu>
       </el-menu>
     </el-aside>
     <el-main>
@@ -62,7 +68,11 @@
       <el-divider></el-divider>
       <!-- 主体部分 -->
       <div>
-        <router-view />
+        <!-- keep-alive 缓存标签 -->
+        <keep-alive>
+          <router-view v-if="$route.meta.keepAlive" />
+        </keep-alive>
+        <router-view v-if="!$route.meta.keepAlive" />
       </div>
     </el-main>
   </el-container>

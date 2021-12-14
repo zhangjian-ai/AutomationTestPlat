@@ -7,7 +7,11 @@ COPY . /var/www/html/backend/
 WORKDIR /var/www/html/backend
 # 下载第三方包
 RUN pip3 install https://github.com/darklow/django-suit/tarball/v2 \
-&& pip3 install -i https://pypi.doubanio.com/simple uwsgi
+&& pip3 install -i https://pypi.doubanio.com/simple uwsgi \
+
+# asgi 部署时需要安装 asgi 服务器
+&& pip3 install -i https://pypi.doubanio.com/simple daphne
+
 RUN pip3 install -i https://pypi.doubanio.com/simple -r requirements.txt \
 # 设置start.sh文件可执行权限
 && chmod +x ./start.sh \

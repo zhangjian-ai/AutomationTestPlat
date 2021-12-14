@@ -60,7 +60,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         # 验证手机号
         mobile = attrs.get('mobile')
 
-        if not re.match('1[3-9]\d{9}$', mobile):
+        if not re.match(r"^1[3-9]\d{9}$", mobile):
             raise serializers.ValidationError('手机号不合法。')
 
         # 验证两次输入的密码是否一致

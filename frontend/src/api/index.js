@@ -97,6 +97,9 @@ export const saveTestResult = data => { return axios.post('/testResult/', data) 
 // 获取测试任务统计面板,
 export const job_inductions = (scope = 'W') => { return axios.get(`/jobInductions/`, { params: { scope: scope } }) }
 
+// 获取资源列表
+export const source_list = (page, page_size, conditions) => { return axios.get('/sourceList/', { params: { page: page, page_size: page_size, conditions: conditions } }) }
+
 
 
 import store from '../store'

@@ -30,7 +30,7 @@ SECRET_KEY = 'at7wt*(#pn!-*db1#*a@d@4w6#@_u&ouc%0pr7hxkn%7$0bi-+'
 DEBUG = False
 
 # Django只允许下面列表中的ip访问。* 代表所有
-ALLOWED_HOSTS = ['121.4.47.229']
+ALLOWED_HOSTS = ['101.43.61.175']
 
 # Application definition
 
@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',  # 解决跨域问题
     'django_crontab',  # 定时任务
+    'channels',  # asgi
 
     # 自定义app
     'users',
@@ -97,9 +98,9 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',  # 数据库引擎
-        'HOST': '121.4.47.229',  # 数据库主机
+        'HOST': '101.43.61.175',  # 数据库主机
         'PORT': 3300,  # 数据库端口
-        'USER': 'zm_admin',  # 数据库用户名
+        'USER': 'root',  # 数据库用户名
         'PASSWORD': 'zm_123456',  # 数据库用户密码
         'NAME': 'test_plat'  # 数据库名字
     }
@@ -109,7 +110,7 @@ DATABASES = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://121.4.47.229:6330/0",
+        "LOCATION": "redis://101.43.61.175:6330/0",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "PASSWORD": "zm_123456",
@@ -245,18 +246,18 @@ AUTH_USER_MODEL = 'users.User'
 
 # CORS添加跨域白名单
 CORS_ORIGIN_WHITELIST = (
-    'http://121.4.47.229:8090',
+    'http://101.43.61.175:8090',
 )
 CORS_ALLOW_CREDENTIALS = True  # 允许携带cookie
 
 # 钉钉登陆参数
 DT_APP_ID = '1243403811'
 DT_APP_KEY = 'dingvzkg1s02pck4sgyx'
-DT_REDIRECT_URI = 'http://121.4.47.229:8090/callBack'
+DT_REDIRECT_URI = 'http://101.43.61.175:8090/callBack'
 DT_CLIENT_SECRET = 'FDCss73H328XKhNgkHAGndzkn-wPdaiVNuny-SShq3UNoGpWNJ38hjaREHf7DiQZ'
 
 # FastDFS 配置
-FDFS_URL = 'http://121.4.47.229:8888/'
+FDFS_URL = 'http://101.43.61.175:8888/'
 FDFS_CLIENT_CONF = os.path.join(BASE_DIR, 'utils/fastdfs/client.conf')
 
 # 指定自定义的django文件存储类
@@ -274,3 +275,6 @@ CRONJOBS = [
 
 # 解决crontab中文问题
 CRONTAB_COMMAND_PREFIX = 'LANG_ALL=zh_cn.UTF-8'
+
+# ==========ASGI==========
+ASGI_APPLICATION = 'backend.asgi.application'

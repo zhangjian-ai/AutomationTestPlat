@@ -186,11 +186,10 @@ export default {
           // 获取文件名fileName
           let fileName = res.headers["content-dispositon"].split("=");
           // 直接调用属性名设置download属性
-          console.log(fileName);
           a.download = fileName[fileName.length - 1];
           // 这是href属性，另一种设置属性的方法
           a.setAttribute("href", e.target.result);
-          // 将其添加到body中，点击时调用href，然后再
+          // 将其添加到body中，点击时调用href，然后再删除 a 标签
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);

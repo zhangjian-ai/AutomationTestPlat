@@ -1,5 +1,6 @@
 import json
 import math
+import threading
 
 from channels.generic.websocket import WebsocketConsumer
 from channels.exceptions import StopConsumer
@@ -15,6 +16,25 @@ from rest_framework.exceptions import ValidationError
 class SourceUploadConsumer(WebsocketConsumer):
     source_info = None
     content = b''
+
+    count = 0
+    total = 0
+    # 将文件按 25M 一份存入服务器
+    size = 25 * 1024 * 1024
+
+    file_ids = []
+    threads = []
+
+    def write(self, client, count):
+        try:
+            file_id = client._save(name=self.source_info['name'],
+                                   content=self.content[self.count * self.size: (self.count + 1) * self.size])
+            self.file_ids.append((count, file_id))
+        except (ConnectionError, FdfsDataError, DataError, TypeError) as e:
+            # 文件服务器连接异常/数据库写入异常
+            self.send(rf"saving.{str(e)}")
+            self.close()
+            raise StopConsumer
 
     def websocket_connect(self, message):
         # 服务端允许客户端创建连接
@@ -35,31 +55,29 @@ class SourceUploadConsumer(WebsocketConsumer):
                 client = FastDFSStorage()
 
                 # 删除不需要的字段。2021-12-13 决定保留，以作后用
-                # del self.source_info['size_byte']
+                # del self.source_info['size_bytes']
 
-                # 将文件按 25M 一份存入服务器
-                count = 0
-                size = 25 * 1024 * 1024
-                total = math.ceil(len(self.content) / size)
+                self.total = math.ceil(len(self.content) / self.size)
 
-                while count < total:
+                while self.count < self.total:
                     # 保存文件到服务器
-                    try:
-                        file_id = client._save(name=self.source_info['name'],
-                                               content=self.content[count * size: (count + 1) * size])
-                        self.source_info['file_id'] = file_id
+                    t = threading.Thread(target=self.write, args=(client, self.count))
+                    t.start()
+                    self.threads.append(t)
 
-                        # 保存资源信息到数据库
-                        SourceModel.objects.create(**self.source_info)
-                    except (ConnectionError, FdfsDataError, DataError, TypeError) as e:
-                        # 文件服务器连接异常/数据库写入异常
-                        self.send(rf"saving.{str(e)}")
-                        self.close()
-                        raise StopConsumer
-                    else:
-                        # 计数器累加，并返回当前进度
-                        count += 1
-                        self.send(rf"saving.当前写入进度: {count} / {total}")
+                    # 计数器累加，并返回当前进度
+                    self.count += 1
+
+                for t in self.threads:
+                    t.join()
+
+                # 保存资源信息到数据库
+                self.file_ids.sort(key=lambda x: x[0])
+                for item in self.file_ids:
+                    self.source_info['file_id'] = item[1]
+                    SourceModel.objects.create(**self.source_info)
+
+                    self.send(rf"saving.当前写入进度: {item[0] + 1} / {self.total}")
 
                 # 向前端发送结束标识
                 self.send(text_data="close.写入完成，上传成功。")
@@ -78,9 +96,22 @@ class SourceUploadConsumer(WebsocketConsumer):
 class SourceDownloadConsumer(WebsocketConsumer):
     source_info = None
     content = b''
+    contents = []
     count = 0
     size = 102400
     total = 0
+
+    threads = []
+
+    def read(self, client, count, file_id):
+        # 多线程读取文件服务器资源
+        try:
+            content = client.client.download_to_buffer(file_id.encode())['Content']
+            self.contents.append((count, content))
+        except (ConnectionError, FdfsDataError) as e:
+            self.send(rf"error.{str(e)}")
+            self.close()
+            raise StopConsumer
 
     def websocket_connect(self, message):
         # 服务端允许客户端创建连接
@@ -101,16 +132,24 @@ class SourceDownloadConsumer(WebsocketConsumer):
                 client = FastDFSStorage()
 
                 # 从文件服务器拉取资源
-                count = 0
-                for item in self.source_info:
-                    count += 1
-                    self.send(rf"prepare.{count}")
-                    self.content += client.client.download_to_buffer(item['file_id'].encode())['Content']
+                self.send(rf"prepare.Please waiting")
+                for index, item in enumerate(self.source_info):
+                    t = threading.Thread(target=self.read, args=(client, index, item['file_id']))
+                    t.start()
+                    self.threads.append(t)
+
+                for t in self.threads:
+                    t.join()
+
+                # 拼接bytes
+                self.contents.sort(key=lambda x: x[0])
+                for item in self.contents:
+                    self.content += item[1]
 
                 # 计算资源的真实大小
                 self.total = len(self.content)
 
-            except (ConnectionError, FdfsDataError, DataError, TypeError, AttributeError, ValidationError) as e:
+            except (DataError, TypeError, AttributeError, ValidationError) as e:
                 self.send(rf"error.{str(e)}")
                 self.close()
                 raise StopConsumer

@@ -208,6 +208,11 @@ export default {
 
     // 下载资源
     downloadSource(row) {
+      // 修改接收标识，重置已接收资源大小
+      this.name = ""
+      this.content = [];
+      this.percentage = this.cur = this.flag = 0;
+
       // 建立WebSocket连接
       this.socket = new WebSocket(
         `ws://${axios.defaults.baseURL.split("/")[2]}/ws/download/`
@@ -273,9 +278,7 @@ export default {
             // 关闭socket
             this.socket.close();
 
-            this.content = [];
             this.showProgress = false;
-            this.percentage = this.cur = this.flag = 0;
           }
 
           return;
@@ -287,7 +290,7 @@ export default {
 
           // 修改已接收资源长度，计算百分比(这里降低一下计算的频率)
           this.cur += event.data.size;
-          if (this.cur % 2048000 == 0 || this.cur == this.total) {
+          if (this.cur % 204800 == 0 || this.cur == this.total) {
             this.percentage = Math.floor((this.cur / this.total) * 100);
           }
 
@@ -317,9 +320,6 @@ export default {
               this.socket.send("complete");
             };
 
-            // 修改接收标识
-            this.flag = 0;
-
             return;
           }
 
@@ -334,10 +334,8 @@ export default {
           // 客户端同步断开连接
           this.socket.close();
 
-          // 隐藏进度条，重置已接收资源大小
-          this.content = [];
+          // 隐藏进度条
           this.showProgress = false;
-          this.percentage = this.cur = this.flag = 0;
         }
       };
     }
@@ -353,9 +351,9 @@ export default {
   },
 
   watch: {
-      showProgress(cur, old) {
-          console.log(cur, old)
-      }
+    showProgress(cur, old) {
+      console.log(cur, old);
+    }
   }
 };
 </script>

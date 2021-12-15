@@ -209,7 +209,7 @@ export default {
     // 下载资源
     downloadSource(row) {
       // 修改接收标识，重置已接收资源大小
-      this.name = ""
+      this.name = "";
       this.content = [];
       this.percentage = this.cur = this.flag = 0;
 
@@ -349,12 +349,6 @@ export default {
     pagination,
     uploadSource
   },
-
-  watch: {
-    showProgress(cur, old) {
-      console.log(cur, old);
-    }
-  }
 };
 </script>
 <style scoped>
@@ -392,6 +386,7 @@ export default {
 }
 
 .box-card {
+  z-index: 100;
   width: 20%;
   position: fixed;
   left: 1%;

@@ -93,6 +93,8 @@ export default {
     handleHttpRequest(file) {
       // 校验表单
       this.$refs.sourceForm.validate(valid => {
+        console.log(file.file.size);
+
         if (valid) {
           // 建立WebSocket连接
           this.socket = new WebSocket(

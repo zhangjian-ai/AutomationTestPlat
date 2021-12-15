@@ -13,3 +13,9 @@ class ImageAdmin(admin.ModelAdmin):
 class ImageAdmin(admin.ModelAdmin):
     # 设置现实字段
     list_display = ['id', 'name', 'scope', 'file', 'create_time']
+
+
+@admin.register(SourceModel)
+class SourceAdmin(admin.ModelAdmin):
+    # 设置现实字段
+    list_display = ['uid', 'name', 'os', 'version', 'author']

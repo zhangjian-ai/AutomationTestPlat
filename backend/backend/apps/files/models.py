@@ -6,6 +6,7 @@ from django.db.models.signals import post_delete
 from django.dispatch import receiver
 
 from backend.utils.fastdfs.FastDFSStorage import FastDFSStorage
+from fdfs_client.exceptions import DataError
 
 
 class Image(BaseModel):
@@ -73,5 +74,8 @@ def delete_storage(sender, **kwargs):
 
 @receiver(post_delete, sender=SourceModel)
 def delete_storage(sender, **kwargs):
-    storage = FastDFSStorage()
-    storage.delete(kwargs['instance'].file_id)
+    try:
+        storage = FastDFSStorage()
+        storage.delete(kwargs['instance'].file_id)
+    except DataError:
+        pass

@@ -14,16 +14,18 @@ from rest_framework.exceptions import ValidationError
 
 
 class SourceUploadConsumer(WebsocketConsumer):
-    source_info = None
-    content = b''
+    def __init__(self):
+        super().__init__()
+        self.source_info = None
+        self.content = b''
 
-    count = 0
-    total = 0
-    # 将文件按 25M 一份存入服务器
-    size = 25 * 1024 * 1024
+        self.count = 0
+        self.total = 0
+        # 将文件按 25M 一份存入服务器
+        self.size = 25 * 1024 * 1024
 
-    file_ids = []
-    threads = []
+        self.file_ids = []
+        self.threads = []
 
     def write(self, client, count):
         try:
@@ -94,14 +96,16 @@ class SourceUploadConsumer(WebsocketConsumer):
 
 
 class SourceDownloadConsumer(WebsocketConsumer):
-    source_info = None
-    content = b''
-    contents = []
-    count = 0
-    size = 102400
-    total = 0
+    def __init__(self):
+        super().__init__()
+        self.source_info = None
+        self.content = b''
+        self.contents = []
+        self.count = 0
+        self.size = 102400
+        self.total = 0
 
-    threads = []
+        self.threads = []
 
     def read(self, client, count, file_id):
         # 多线程读取文件服务器资源

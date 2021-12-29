@@ -143,7 +143,7 @@ class CaseView(APIView):
         serializer.save()
 
         logger.warning(f"用例添加成功，id：{serializer.data['id']}")
-        return Response({'msg': '用例添加成功'}, status=status.HTTP_201_CREATED)
+        return Response({'msg': '用例添加成功', 'data': serializer.data}, status=status.HTTP_201_CREATED)
 
     def put(self, request):
         """修改用例"""

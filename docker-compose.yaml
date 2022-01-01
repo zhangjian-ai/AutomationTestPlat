@@ -22,10 +22,10 @@ services:
     networks:
       extnetwork:
         ipv4_address: 172.33.0.2
-#    depends_on:
-#      - mysql
-#    links:
-#      - mysql
+    depends_on:
+      - mysql
+    links:
+      - mysql
 
 
   web:

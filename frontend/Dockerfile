@@ -1,5 +1,5 @@
 # nginx镜像
-FROM nginx:latest
+FROM nginx:1.18
 # 删除原有配置文件，创建静态资源文件夹和ssl证书保存文件夹
 RUN mkdir -p /usr/share/nginx/html/static \
 && mkdir -p /usr/share/nginx/html/media \

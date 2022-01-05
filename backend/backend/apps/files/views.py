@@ -5,7 +5,6 @@ import logging
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
-from fdfs_client.exceptions import DataError
 from rest_framework import status
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
@@ -130,17 +129,8 @@ class SourceListView(ListAPIView):
         if create_time:
             instances = SourceModel.objects.filter(**valid_conditions, name__contains=name,
                                                    create_time__gte=create_time[0],
-                                                   create_time__lte=create_time[1]).values()
+                                                   create_time__lte=create_time[1])
         else:
-            instances = SourceModel.objects.filter(**valid_conditions, name__contains=name).values()
+            instances = SourceModel.objects.filter(**valid_conditions, name__contains=name)
 
-        # 根据uid进行分组。Django ORM 的分组很拉垮
-        temp_list = []
-        source_list = []
-
-        for item in instances:
-            if item['uid'] not in temp_list:
-                temp_list.append(item['uid'])
-                source_list.append(item)
-
-        return source_list
+        return instances

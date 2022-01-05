@@ -31,3 +31,11 @@ class SourceListSerializer(serializers.ModelSerializer):
     class Meta:
         model = SourceModel
         fields = '__all__'
+
+
+class SourceStorePathSerializer(serializers.ModelSerializer):
+    """资源文件存储路径序列化器"""
+
+    class Meta:
+        model = SourceStorePathModel
+        fields = '__all__'

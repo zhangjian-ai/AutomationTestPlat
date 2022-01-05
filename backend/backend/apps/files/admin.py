@@ -18,4 +18,4 @@ class ImageAdmin(admin.ModelAdmin):
 @admin.register(SourceModel)
 class SourceAdmin(admin.ModelAdmin):
     # 设置现实字段
-    list_display = ['uid', 'name', 'os', 'version', 'author']
+    list_display = ['uid', 'name', 'os', 'version', 'provider', 'count']

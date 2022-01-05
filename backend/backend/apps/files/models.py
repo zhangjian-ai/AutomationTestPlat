@@ -5,8 +5,9 @@ from backend.utils.constants import RESOURCE
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
 
-from backend.utils.fastdfs.FastDFSStorage import FastDFSStorage
 from fdfs_client.exceptions import DataError
+
+from backend.utils.fastdfs.FastDFSStorage import FastDFSStorage
 
 
 class Image(BaseModel):
@@ -38,14 +39,15 @@ class File(BaseModel):
 
 class SourceModel(BaseModel):
     """系统资源库"""
-    uid = models.BigIntegerField(verbose_name="UID")
-    name = models.CharField(max_length=250, verbose_name="资源名称")
+    uid = models.BigIntegerField(verbose_name="UID", unique=True)
+    name = models.CharField(max_length=250, unique=True, verbose_name="资源名称")
     os = models.CharField(max_length=12, verbose_name="操作系统")
-    version = models.CharField(max_length=20, verbose_name="版本")
+    version = models.CharField(max_length=30, verbose_name="版本")
+    desc = models.CharField(max_length=48, verbose_name="简介", default="")
     size = models.CharField(max_length=10, verbose_name="文件大小")
     size_bytes = models.BigIntegerField(verbose_name="文件大小(字节)", default=0)
-    file_id = models.CharField(max_length=200, verbose_name="资源路径")
-    author = models.CharField(max_length=20, verbose_name="贡献者")
+    provider = models.CharField(max_length=20, verbose_name="贡献者")
+    count = models.IntegerField(default=0, verbose_name="下载次数")
 
     class Meta:
         db_table = "tp_source"
@@ -54,6 +56,12 @@ class SourceModel(BaseModel):
 
     def __str__(self):
         return self.name
+
+
+class SourceStorePathModel(models.Model):
+    """资源路径视图"""
+    file_id = models.CharField(max_length=200, unique=True, verbose_name="资源路径")
+    source_id = models.ForeignKey(SourceModel, related_name="links", on_delete=models.CASCADE, verbose_name="资源ID")
 
 
 # ******************下面的操作是为了在删除数据库数据时，同时删除掉fastDFS里面保存的文件*****************
@@ -72,7 +80,7 @@ def delete_storage(sender, **kwargs):
     storage.delete(kwargs['instance'].file.__str__())
 
 
-@receiver(post_delete, sender=SourceModel)
+@receiver(post_delete, sender=SourceStorePathModel)
 def delete_storage(sender, **kwargs):
     try:
         storage = FastDFSStorage()

@@ -21,8 +21,8 @@
               </el-form-item>
             </el-col>
             <el-col :span="6">
-              <el-form-item label="贡献者:">
-                <el-input v-model="conditions.author" clearable></el-input>
+              <el-form-item label="提供者:">
+                <el-input v-model="conditions.provider" clearable></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="6">
@@ -33,6 +33,7 @@
                   <el-option label="Linux/Unix" value="Linux/Unix"></el-option>
                   <el-option label="Android" value="Android"></el-option>
                   <el-option label="IOS" value="IOS"></el-option>
+                  <el-option label="未知" value="未知"></el-option>
                 </el-select>
               </el-form-item>
             </el-col>
@@ -82,16 +83,17 @@
       size="mini"
       :header-cell-style="{background:'#eef1f6',color:'#606266', 'text-align': 'center'}"
     >
-      <el-table-column type="selection" align="center"></el-table-column>
-      <el-table-column label="序号" type="index" min-width="50%" align="center"></el-table-column>
-      <el-table-column prop="uid" label="UID" min-width="100%" align="center"></el-table-column>
-      <el-table-column prop="name" label="资源名称" min-width="300%" align="center"></el-table-column>
-      <el-table-column prop="os" label="操作系统" min-width="120%" align="center"></el-table-column>
-      <el-table-column prop="version" label="版本" min-width="80%" align="center"></el-table-column>
+      <el-table-column label="序号" type="index" min-width="30%" align="center"></el-table-column>
+      <el-table-column prop="uid" label="UID" min-width="120%" align="center"></el-table-column>
+      <el-table-column prop="name" label="名称" min-width="200%" align="center"></el-table-column>
+      <el-table-column prop="desc" label="简介" min-width="160%" align="center"></el-table-column>
+      <el-table-column prop="os" label="操作系统" min-width="80%" align="center"></el-table-column>
+      <el-table-column prop="version" label="版本" min-width="60%" align="center"></el-table-column>
       <el-table-column prop="size" label="大小" min-width="100%" align="center"></el-table-column>
       <el-table-column prop="create_time" label="上传时间" min-width="150%" align="center"></el-table-column>
-      <el-table-column prop="author" label="贡献者" min-width="100%" align="center"></el-table-column>
-      <el-table-column label="操作" align="center" min-width="80%">
+      <el-table-column prop="provider" label="提供者" min-width="100%" align="center"></el-table-column>
+      <el-table-column prop="count" label="下载次数" min-width="80%" align="center"></el-table-column>
+      <el-table-column label="操作" align="center" min-width="60%">
         <template slot-scope="scope">
           <el-button
             :disabled="showProgress"
@@ -348,7 +350,7 @@ export default {
   components: {
     pagination,
     uploadSource
-  },
+  }
 };
 </script>
 <style scoped>

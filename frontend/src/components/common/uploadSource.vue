@@ -41,10 +41,21 @@
           <el-option label="Linux/Unix" value="Linux/Unix"></el-option>
           <el-option label="Android" value="Android"></el-option>
           <el-option label="IOS" value="IOS"></el-option>
+          <el-option label="未知" value="未知"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="版本号:" prop="version" label-width="25%">
         <el-input v-model="sourceForm.version" placeholder="例如: jdk1.8"></el-input>
+      </el-form-item>
+      <el-form-item label="描述信息:" prop="desc" label-width="25%">
+        <el-input
+          v-model="sourceForm.desc"
+          type="textarea"
+          placeholder="最多输入48个字符"
+          show-word-limit
+          :autosize="{ minRows: 1, maxRows: 2}"
+          maxlength="48"
+        ></el-input>
       </el-form-item>
     </el-form>
     <el-progress :percentage="percentage" v-show="showProgress"></el-progress>
@@ -188,8 +199,8 @@ export default {
         this.sourceForm.size = Math.round(file.size / 10000) / 100 + "M";
         this.sourceForm.size_bytes = file.size;
 
-        // 添加贡献者信息
-        this.sourceForm.author = this.$store.state.nickname;
+        // 添加提供者信息
+        this.sourceForm.provider = this.$store.state.nickname;
       }
     },
 

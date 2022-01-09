@@ -26,6 +26,7 @@ axios.defaults.withCredentials = true
 // http request 拦截器
 axios.interceptors.request.use(
     config => {
+        // 添加token
         if (store.state.token) {
             // 判断是否存在token，如果存在的话，则每个http header都加上token。本项目使用JWT
             config.headers.Authorization = `JWT ${store.state.token}`;

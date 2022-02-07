@@ -1,5 +1,5 @@
 <template>
-  <div class="main" :style="{backgroundImage: 'url('+$store.state.login_url+')',backgroundSize: '100% 100%'}">
+  <div class="main" :style="{backgroundImage: 'url('+$store.state.login+')',backgroundSize: '100% 100%'}">
     <!-- 内容盒子 -->
     <el-row class="box">
       <div class="sub_box">

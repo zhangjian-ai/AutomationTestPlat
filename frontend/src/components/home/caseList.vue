@@ -109,8 +109,7 @@
       <el-table-column prop="priority_str" label="优先级" min-width="60%" align="center"></el-table-column>
       <el-table-column label="自动化" min-width="60%" align="center">
         <template slot-scope="scope">
-          <el-image v-if="scope.row.is_auto" :src="$store.state.auto_true"></el-image>
-          <el-image v-else :src="$store.state.auto_false"></el-image>
+          {{ scope.row.is_auto ? "是" : "否" }}
         </template>
       </el-table-column>
       <el-table-column prop="author" label="AUTHOR" min-width="100%" align="center"></el-table-column>

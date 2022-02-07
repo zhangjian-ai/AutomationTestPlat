@@ -100,11 +100,9 @@ export default new Vuex.Store({
     // 设置系统图片链接
     setImageUrl(state, payload) {
       if (payload) {
-        state.logo_url = payload.logo;
-        state.login_url = payload.login;
-        state.auto_false = payload.auto_false;
-        state.auto_true = payload.auto_true;
-        state.loading = payload.loading
+        state.logo = payload.logo;
+        state.login = payload.login;
+        state.loading = payload.loading;
       }
     },
     // 设置系统静态文件链接

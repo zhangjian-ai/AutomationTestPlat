@@ -11,7 +11,7 @@ SMS_TEMPLATE_ID = 1
 
 # 静态资源
 RESOURCE = {
-    'IMAGE': [(0, 'login'), (1, 'logo'), (2, 'auto_true'), (3, 'auto_false'), (4, 'loading')],
+    'IMAGE': [(0, 'login'), (1, 'logo'), (4, 'loading')],
     'FILE': [(0, 'xmind_template')]
 }
 

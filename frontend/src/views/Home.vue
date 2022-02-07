@@ -12,7 +12,7 @@
         active-text-color="#ffd04b"
       >
         <!-- LOGO -->
-        <el-image :src="$store.state.logo_url"></el-image>
+        <el-image :src="$store.state.logo"></el-image>
         <el-submenu index="1">
           <template slot="title">用例管理</template>
           <el-menu-item index="/caseList">
@@ -92,7 +92,7 @@ export default {
       this.$router.replace("/login/account");
     }
   },
-  mounted() {
+  created() {
     this.$store.dispatch("loadImage");
     this.$store.dispatch("loadStaticFile");
     this.$store.dispatch("loadOption");

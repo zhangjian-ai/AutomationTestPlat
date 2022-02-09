@@ -100,6 +100,8 @@ export const job_inductions = (scope = 'W') => { return axios.get(`/jobInduction
 // 获取资源列表
 export const source_list = (page, page_size, conditions) => { return axios.get('/sourceList/', { params: { page: page, page_size: page_size, conditions: conditions } }) }
 
+// 执行接口测试
+export const execute_test = data => { return axios.post('/test/', data) }
 
 
 import store from '../store'

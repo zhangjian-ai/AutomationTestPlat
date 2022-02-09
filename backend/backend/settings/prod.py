@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'cases',
     'jobs',
     'inductions',
+    'apitest',
 
 ]
 

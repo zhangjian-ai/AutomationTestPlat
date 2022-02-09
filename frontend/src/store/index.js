@@ -31,10 +31,8 @@ export default new Vuex.Store({
     case_status: [],
 
     // 静态图片链接
-    logo_url: "",
-    login_url: "",
-    auto_true: "",
-    auto_false: "",
+    logo: "",
+    login: "",
     loading: "",
 
     // 静态文件链接

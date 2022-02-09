@@ -1014,3 +1014,4 @@ cases.models.Module.DoesNotExist: Module matching query does not exist.
 [2022-02-07 14:08:51,599][views][73][INFO][无可用的静态文件]
 [2022-02-07 14:20:25,858][views][99][INFO][用户[风花雪月]登陆成功]
 [2022-02-07 14:29:33,569][views][99][INFO][用户[风花雪月]登陆成功]
+[2022-02-08 21:30:59,556][views][99][INFO][用户[风花雪月]登陆成功]

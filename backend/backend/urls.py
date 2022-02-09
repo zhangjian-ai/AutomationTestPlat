@@ -24,4 +24,6 @@ urlpatterns = [
     path('api/', include('cases.urls')),  # 用例上传
     path('api/', include('jobs.urls')),  # 测试任务
     path('api/', include('inductions.urls')),  # 统计模块
+    path('api/', include('apitest.urls')),  # 统计模块
+
 ]

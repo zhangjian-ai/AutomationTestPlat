@@ -32,6 +32,12 @@
           </el-menu-item>
         </el-submenu>
         <el-submenu index="3">
+          <template slot="title">接口测试</template>
+          <el-menu-item index="/apiTest">
+            <span slot="title">接口测试</span>
+          </el-menu-item>
+        </el-submenu>
+        <el-submenu index="4">
           <template slot="title">资源管理</template>
           <el-menu-item index="/sourceList">
             <span slot="title">资源列表</span>

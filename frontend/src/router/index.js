@@ -108,6 +108,15 @@ const routes = [
         },
       },
       {
+        path: 'apiTest',
+        name: 'api_test',
+        component: () => import('@/components/home/apiTest.vue'),
+        meta: {
+          title: "接口测试",
+          requireAuth: true
+        },
+      },
+      {
         path: 'sourceList',
         name: 'source_list',
         component: () => import('@/components/home/sourceList.vue'),

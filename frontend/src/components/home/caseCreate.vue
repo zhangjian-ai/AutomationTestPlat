@@ -267,9 +267,6 @@ export default {
   width: 96%;
   margin: 2%;
 }
-.uploadXmind {
-  width: 100%;
-}
 .main {
   width: 30em;
   margin-left: 2%;

@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'cases',
     'jobs',
     'inductions',
+    'apitest',
 
 ]
 
@@ -279,7 +280,6 @@ CRONTAB_COMMAND_PREFIX = 'LANG_ALL=zh_cn.UTF-8'
 
 # ==========ASGI==========
 ASGI_APPLICATION = 'backend.asgi.application'
-
 
 if __name__ == '__main__':
     print(BASE_DIR)

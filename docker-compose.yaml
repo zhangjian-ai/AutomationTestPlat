@@ -44,20 +44,19 @@ services:
 
 
   #---------------第一次构建时请打开注释----------------
-#  mysql:
-#    image: mysql:5.7.13
-#    container_name: TP_mysql
-#    restart: always
-#    volumes:
-#      - /var/local/myapp/mysql/data:/var/lib/mysql
+  mysql:
+    image: mysql:5.7.37
+    container_name: TP-mysql
+    restart: always
+    volumes:
+      - /var/local/myapp/mysql/data:/var/lib/mysql
 #    environment:
-#      - MYSQL_ROOT_PASSWORD=zm_123456
-#      - MYSQL_DATABASE=test_plat
-#      - MYSQL_USER=zm_admin
-#      - MYSQL_PASSWORD=zm_123456
-#    command: [ '--character-set-server=utf8mb4','--collation-server=utf8mb4_unicode_ci' ]
-#    ports:
-#      - "3300:3306"
+#      - MYSQL_ROOT_PASSWORD=
+#      - MYSQL_USER=
+#      - MYSQL_PASSWORD=
+    command: [ '--character-set-server=utf8mb4','--collation-server=utf8mb4_unicode_ci' ]
+    ports:
+      - "3300:3306"
 #
 #  redis:
 #    image: redis:6.0
